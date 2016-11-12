@@ -50,13 +50,14 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,18 @@
 +#ifndef QTRAC_QIK
 +#define QTRAC_QIK
 +
 +namespace qtrac {
 +
 +class qik {
++public:
 +	qik();
 +	~qik();
 +
