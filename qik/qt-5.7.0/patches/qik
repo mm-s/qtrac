@@ -1,0 +1,70 @@
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/global.pri
+===================================================================
+--- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/corelib/global/global.pri
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/global.pri
+@@ -18,7 +18,8 @@ HEADERS +=  \
+         global/qtypetraits.h \
+         global/qflags.h \
+         global/qhooks_p.h \
+-        global/qversiontagging.h
++        global/qversiontagging.h \
++        global/qik.h
+ 
+ SOURCES += \
+         global/archdetect.cpp \
+@@ -29,7 +30,8 @@ SOURCES += \
+         global/qnumeric.cpp \
+         global/qlogging.cpp \
+         global/qhooks.cpp \
+-        global/qversiontagging.cpp
++        global/qversiontagging.cpp \
++        global/qik.cpp
+ 
+ # qlibraryinfo.cpp includes qconfig.cpp
+ INCLUDEPATH += $$QT_BUILD_TREE/src/corelib/global
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
+===================================================================
+--- /dev/null
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
+@@ -0,0 +1,19 @@
++#include "qik.h"
++
++using namespace qtrac;
++using namespace std;
++
++typedef qtrac::qik c;
++
++c _qik_instance;
++
++c::qik() {
++}
++
++c::~qik() {
++}
++
++qik& c::instance() {
++	return _qik_instance;
++}
++
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
+===================================================================
+--- /dev/null
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
+@@ -0,0 +1,17 @@
++#ifndef QTRAC_QIK
++#define QTRAC_QIK
++
++namespace qtrac {
++
++class qik {
++	qik();
++	~qik();
++
++
++	static qik& instance();
++};
++
++
++}
++
++#endif
