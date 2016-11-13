@@ -28,7 +28,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,91 @@
+@@ -0,0 +1,161 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -45,10 +45,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +
 +c _qik_instance;
 +
-+c::qik():debug(false) {
++c::qik():debug(0) {
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
 +	if (env.contains(QString::fromLatin1("QTRAC_DEBUG"))) {
-+		debug=true;
++		debug=new QFile("qtrac.log");
 +	}
 +	if (!env.contains(QString::fromLatin1("QTRAC_NOBANNER"))) {
 +		qtrac::banner(stdout);
@@ -68,6 +68,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +		if (debug) cout << "output_filename=" << output_filename.toStdString() << endl;
 +	}
 +
++	QString output_socket;
 +	{
 +		if (env.contains(QString::fromLatin1("QTRAC_OUTPUT_SOCKET"))) {
 +			output_socket=env.value(QString::fromLatin1("QTRAC_OUTPUT_SOCKET"));
@@ -96,6 +97,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +}
 +
 +c::~qik() {
++	delete debug;
 +}
 +
 +qik& c::instance() {
@@ -105,8 +107,29 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +void c::log(string data, void* o) {
 +	Qt::HANDLE tid=QThread::currentThreadId();
 +	ostringstream os;
-+	os << tid << " " << o << " " << data;
-+	
++	os << tid << " " << o << " " << data << endl;
++
++	if (sockfd==0) return;
++	string sbuff=os.str();
++	const char* p=sbuff.c_str();
++    int tot=sbuff.size();
++	while(tot>0) {
++		int n=write(sockfd,p,tot);
++		if (n < 0)  {
++		     error("ERROR writing to socket");
++			 return;
++		}
++		tot-=n;
++		p+=n;
++	}
++/*
++    bzero(buffer,256);
++    n = read(sockfd,buffer,255);
++    if (n < 0) 
++         error("ERROR reading from socket");
++    printf("%s\n",buffer);
++    return 0;
++*/
 +
 +}
 +
@@ -114,9 +137,56 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +
 +}
 +
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <string.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <netdb.h> 
++void c::error(string err) {
++	if (!debug) return;
 +
++}
 +
++void c::connect() {
 +
++    struct sockaddr_in serv_addr;
++    struct hostent *server;
++
++    char buffer[256];
++    sockfd = socket(AF_INET, SOCK_STREAM, 0);
++    if (sockfd < 0) {
++        error("ERROR opening socket");
++		sockfd=0;
++		return;
++	}
++    server = gethostbyname(host.constData());
++    if (server == 0) {
++	    close(sockfd);
++		sockfd=0;
++        error("no such host");
++        return;
++    }
++    bzero((char *) &serv_addr, sizeof(serv_addr));
++    serv_addr.sin_family = AF_INET;
++    bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
++    serv_addr.sin_port = htons(port);
++    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
++	    close(sockfd);
++		sockfd=0;
++        error("ERROR connecting");
++		return;
++	}
++
++}
++
++void c::disconnect() {
++	if (sockfd==0) return; 
++    close(sockfd);
++	sockfd=0;
++}
 +
 +
 +
@@ -124,15 +194,16 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,35 @@
 +#ifndef QTRAC_QIK
 +#define QTRAC_QIK
 +
 +#include <string>
 +#include <QtCore/qglobal.h>
++#include <QFile>
 +
 +namespace qtrac {
-+
++using namespace std;
 +
 +class Q_CORE_EXPORT qik {
 +public:
@@ -142,12 +213,17 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 +	void log(std::string data, void*);
 +	static qik& instance();
 +
++private:
 +	void read_conf();
++	void connect();
++	void disconnect();
++	void error(string err);
 +
-+	bool debug;
++	QFile* debug;
 +	QString output_filename;
-+	QString output_socket;
-+
++	int port;
++	QString host;
++	int sockfd;
 +};
 +
 +
