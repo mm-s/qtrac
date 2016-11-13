@@ -105,12 +105,12 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 +	qik();
 +	~qik();
 +
-+	void register(std::string);
++	void register(std::string data);
 +	static qik& instance();
 +
 +	void read_conf();
 +
-+	static vaid banner(FILE*);
++	static void banner(FILE*);
 +};
 +
 +
@@ -193,7 +193,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
  
 +fprintf(out, "/*******************************************************************************\n");
 +qtrac::qik::banner(out);
-+fprintf(out, "  *****************************************************************************/\n"
++fprintf(out, "  *****************************************************************************/\n");
  
      if (!noInclude) {
          if (includePath.size() && !includePath.endsWith('/'))
