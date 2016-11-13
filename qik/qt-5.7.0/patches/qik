@@ -26,10 +26,11 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,31 @@
+@@ -0,0 +1,32 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
++#include <Qtrac>
 +
 +using namespace qtrac;
 +using namespace std;
