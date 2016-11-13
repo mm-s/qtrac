@@ -109,7 +109,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
              Q_ASSERT(!f.normalizedType.isEmpty());
              fprintf(out, "        case %d: ", methodindex);
 +            fprintf(out, "{\n          ");
-+            fprintf(out, "qtrac::qik::instance.log(\"%s\");\n          ",f.traceData().c_str());
++            fprintf(out, "qtrac::qik::instance().log(\"%s\");\n          ",f.traceData().c_str());
 +
              if (f.normalizedType != "void")
 -                fprintf(out, "{ %s _r = ", noRef(f.normalizedType).constData());
@@ -236,31 +236,31 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.cpp
 +void qtrac::banner(FILE* out) {
 +fprintf(out, "\n");
 +fprintf(out, "\n");
-+fprintf(out, "                                      >WWw,                                     \n");
-+fprintf(out, "                                       `%WWW                                    \n");
-+fprintf(out, "                                         )8WWu                ,uwu,             \n");
-+fprintf(out, "                                          88WWWu            yWWWWWWWW,          \n");
-+fprintf(out, "                                           `8WWWWwu,       8#WWWWWWWW`          \n");
-+fprintf(out, "                                             '8WWWWWWWWwwwWWWWWWWWW*`           \n");
-+fprintf(out, "                                               `8WWWWWWWWWWWWWWWW*`             \n");
-+fprintf(out, "                                                ##WWWWWWWWWWWW*`                \n");
-+fprintf(out, "   ,,,ywu                                     y#WWWWWWWWWWWWWWWWWWWWWWWwwuuywwW>\n");
-+fprintf(out, "WWWWWWWWWWWWWWWWWWwu,                       ,&#WWWWWWWWWWWWWWWWW%%WWWWW%%%%%**^ \n");
-+fprintf(out, " `^***%%%%WWWWWWWWWWWWWWwwu,,,,uwWWWWWWw,,uWWWWWWWWWWWWWWWWW`                   \n");
-+fprintf(out, "            `*%%%WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW                     \n");
-+fprintf(out, "                 `%WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                      \n");
-+fprintf(out, "                    `*%%WWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                          \n");
-+fprintf(out, "                        `*%%WWWWWWWWWWWWWWWWWWWW%*`                             \n");
-+fprintf(out, "                             ^*%%%WWWWWWWWWW%*`                                 \n");
-+fprintf(out, "                    .d88888b.  888                                              \n");
-+fprintf(out, "                   d88P' 'Y88b 888                                              \n");
-+fprintf(out, "                   888     888 888                                              \n");
-+fprintf(out, "                   888     888 888888 888d888 8888b.   .d8888b                  \n");
-+fprintf(out, "                   888     888 888    888P'      '88b d88P'                     \n");
-+fprintf(out, "                   888 Y8b 888 888    888    .d888888 888                       \n");
-+fprintf(out, "                   Y88b.Y8b88P Y88b.  888    888  888 Y88b.                     \n");
-+fprintf(out, "                    'Y888888'   'Y888 888    'Y888888  'Y8888P                  \n");
-+fprintf(out, "                          Y8b                                                   \n");
++fprintf(out, ".                                      >WWw,                                     .\n");
++fprintf(out, ".                                       `)WWW                                    .\n");
++fprintf(out, ".                                         )8WWu                ,uwu,             .\n");
++fprintf(out, ".                                          88WWWu            yWWWWWWWW,          .\n");
++fprintf(out, ".                                           `8WWWWwu,       8#WWWWWWWW`          .\n");
++fprintf(out, ".                                             '8WWWWWWWWwwwWWWWWWWWW*`           .\n");
++fprintf(out, ".                                               `8WWWWWWWWWWWWWWWW*`             .\n");
++fprintf(out, ".                                                ##WWWWWWWWWWWW*`                .\n");
++fprintf(out, ".   ,,,ywu                                     y#WWWWWWWWWWWWWWWWWWWWWWWwwuuywwW>.\n");
++fprintf(out, ".WWWWWWWWWWWWWWWWWWwu,                       ,&#WWWWWWWWWWWWWWWWW==WWWWW=====**^ .\n");
++fprintf(out, ". `^***====WWWWWWWWWWWWWWwwu,,,,uwWWWWWWw,,uWWWWWWWWWWWWWWWWW`                   .\n");
++fprintf(out, ".            `*===WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW                     .\n");
++fprintf(out, ".                 `=WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                      .\n");
++fprintf(out, ".                    `*==WWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                          .\n");
++fprintf(out, ".                        `*==WWWWWWWWWWWWWWWWWWWW=*`                             .\n");
++fprintf(out, ".                             ^*===WWWWWWWWWW=*`                                 .\n");
++fprintf(out, ".                    .d88888b.  888                                              .\n");
++fprintf(out, ".                   d88P' 'Y88b 888                                              .\n");
++fprintf(out, ".                   888     888 888                                              .\n");
++fprintf(out, ".                   888     888 888888 888d888 8888b.   .d8888b                  .\n");
++fprintf(out, ".                   888     888 888    888P'      '88b d88P'                     .\n");
++fprintf(out, ".                   888 Y8b 888 888    888    .d888888 888                       .\n");
++fprintf(out, ".                   Y88b.Y8b88P Y88b.  888    888  888 Y88b.                     .\n");
++fprintf(out, ".                    'Y888888'   'Y888 888    'Y888888  'Y8888P                  .\n");
++fprintf(out, ".                          Y8b                                                   .\n");
 +fprintf(out, "\n");
 +fprintf(out, "\n");
 +}
