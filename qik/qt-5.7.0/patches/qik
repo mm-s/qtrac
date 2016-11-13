@@ -26,13 +26,14 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,77 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
 +#include <Qtrac>
 +#include <QSettings>
 +#include <sstream>
++#include <iostream>
 +#include <QProcessEnvironment>
 +
 +using namespace qtrac;
@@ -57,7 +58,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +			output_filename=env.value(QString::fromLatin1("QTRAC_OUTPUT_FILENAME"));
 +		}
 +		else {
-+			if (!setting.contains(QString::fromLatin1("output/filename")))
++			if (!settings.contains(QString::fromLatin1("output/filename")))
 +				settings.setValue(QString::fromLatin1("output/filename"), QString::fromLatin1("qtrac.out")); //file
 +		
 +			output_filename=settings.value(QString::fromLatin1("output/filename")).toString();
@@ -70,7 +71,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +			output_socket=env.value(QString::fromLatin1("QTRAC_OUTPUT_SOCKET")).asString();
 +		}
 +		else {
-+			if (!setting.contains(QString::fromLatin1("output/socket")))
++			if (!settings.contains(QString::fromLatin1("output/socket")))
 +				settings.setValue(QString::fromLatin1("output/socket"), QString::fromLatin1(""));
 +			output_socket=settings.value(QString::fromLatin1("output/socket")).toString();
 +		}
