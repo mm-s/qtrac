@@ -153,9 +153,9 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
  QT_BEGIN_NAMESPACE
  
 +std::string FunctionDef::traceData(const ClassDef& cd, void* p) const {
-+	ostringstream os;
++	std::ostringstream os;
 +	if (isSignal) os << "N";
-+	elseif (isSlot) os << "T";
++	else if (isSlot) os << "T";
 +	else os << "?";
 +    os << " " << p << " " << cd.classname.toStdString() << "::" << name.toStdString() << "(" << arguments.size() << ") " << file.toStdString() << ":" << line;
 +	return os.str();
