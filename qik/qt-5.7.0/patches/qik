@@ -26,7 +26,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,32 @@
+@@ -0,0 +1,33 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -50,9 +50,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +	return _qik_instance;
 +}
 +
-+void c::log(string data) {
++void c::log(string data, void* p) {
 +	Qt::HANDLE tid=QThread::currentThreadId();
 +	Q_UNUSED(tid);
++	Q_UNUSED(p);
 +}
 +
 +void c::read_conf() {
@@ -77,7 +78,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 +	qik();
 +	~qik();
 +
-+	void log(std::string data);
++	void log(std::string data, void*);
 +	static qik& instance();
 +
 +	void read_conf();
@@ -112,7 +113,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
              Q_ASSERT(!f.normalizedType.isEmpty());
              fprintf(out, "        case %d: ", methodindex);
 +            fprintf(out, "{\n          ");
-+            fprintf(out, "qtrac::qik::instance().log(\"%s\");\n          ",f.traceData(*cdef,_o).c_str());
++            fprintf(out, "qtrac::qik::instance().log(\"%s\",_o);\n          ",f.traceData(*cdef).c_str());
 +
              if (f.normalizedType != "void")
 -                fprintf(out, "{ %s _r = ", noRef(f.normalizedType).constData());
@@ -152,12 +153,12 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
 +
  QT_BEGIN_NAMESPACE
  
-+std::string FunctionDef::traceData(const ClassDef& cd, void* p) const {
++std::string FunctionDef::traceData(const ClassDef& cd) const {
 +	std::ostringstream os;
 +	if (isSignal) os << "N";
 +	else if (isSlot) os << "T";
 +	else os << "?";
-+    os << " " << p << " " << cd.classname.toStdString() << "::" << name.toStdString() << "(" << arguments.size() << ") " << file.toStdString() << ":" << line;
++    os << " " << cd.classname.toStdString() << "::" << name.toStdString() << "(" << arguments.size() << ") " << file.toStdString() << ":" << line;
 +	return os.str();
 +}
 +
@@ -228,7 +229,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.h
 +
 +	QByteArray file;
 +	int line;
-+	std::string traceData(const ClassDef&, void*) const;
++	std::string traceData(const ClassDef&) const;
  };
  Q_DECLARE_TYPEINFO(FunctionDef, Q_MOVABLE_TYPE);
  
