@@ -26,11 +26,14 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,33 @@
+@@ -0,0 +1,76 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
 +#include <Qtrac>
++#include <QSettings>
++#include <sstream>
++#include <QProcessEnvironment>
 +
 +using namespace qtrac;
 +using namespace std;
@@ -39,8 +42,40 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +
 +c _qik_instance;
 +
-+c::qik() {
-+	qtrac::banner(stdout);
++c::qik():debug(false) {
++	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
++	if (env.contains("QTRAC_DEBUG")) {
++		debug=true;
++	}
++	if (!env.contains("QTRAC_NOBANNER")) {
++		qtrac::banner(stdout);
++	}
++
++	QSettings settings("Qtrac", "qik");
++	{
++		if (env.contains("QTRAC_OUTPUT_FILENAME")) {
++			output_filename=env.value("QTRAC_OUTPUT_FILENAME");
++		}
++		else {
++			if (!setting.contains("output/filename"))
++				settings.setValue("output/filename", "qtrac.out"); //file
++		
++			output_filename=settings.getValue("output/filename").asString();
++		}
++		if (debug) cout << "output_filename=" << output_filename << endl;
++	}
++
++	{
++		if (env.contains("QTRAC_OUTPUT_SOCKET")) {
++			output_socket=env.getValue("QTRAC_OUTPUT_SOCKET").asString();
++		}
++		else {
++			if (!setting.contains("output/socket"))
++				settings.setValue("output/socket", "");
++			output_socket=settings.getValue("output/socket").asString();
++		}
++		if (debug) cout << "output_socket=" << output_socket << endl;
++	}
 +}
 +
 +c::~qik() {
@@ -50,21 +85,29 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +	return _qik_instance;
 +}
 +
-+void c::log(string data, void* p) {
++void c::log(string data, void* o) {
 +	Qt::HANDLE tid=QThread::currentThreadId();
-+	Q_UNUSED(tid);
-+	Q_UNUSED(p);
++	ostringstream os;
++	os << tid << " " << o << " " << data;
++	
++
 +}
 +
 +void c::read_conf() {
++
 +}
++
++
++
++
++
 +
 +
 Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
-@@ -0,0 +1,24 @@
+@@ -0,0 +1,28 @@
 +#ifndef QTRAC_QIK
 +#define QTRAC_QIK
 +
@@ -82,6 +125,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 +	static qik& instance();
 +
 +	void read_conf();
++
++	bool debug;
++	QString output_filename;
++	QString output_socket;
 +
 +};
 +
