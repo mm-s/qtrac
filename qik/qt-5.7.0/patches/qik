@@ -26,8 +26,9 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,31 @@
 +#include "qik.h"
++#include <stdio.h>
 +#include <QThread>
 +
 +using namespace qtrac;
@@ -38,6 +39,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +c _qik_instance;
 +
 +c::qik() {
++	qtrac::banner(stdout);
 +}
 +
 +c::~qik() {
@@ -161,9 +163,9 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
      fprintf(out, "** WARNING! All changes made in this file will be lost!\n"
              "*****************************************************************************/\n\n");
  
-+fprintf(out, "/*******************************************************************************\n");
-+qtrac::banner(out);
-+fprintf(out, "  *****************************************************************************/\n");
++	fprintf(out, "/*\n");
++	qtrac::banner(out);
++	fprintf(out, "*/\n");
  
      if (!noInclude) {
          if (includePath.size() && !includePath.endsWith('/'))
@@ -201,7 +203,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.h
  
      int revision;
 +
-+	std::string file;
++	QString file;
 +	int line;
 +	std::string traceData() const;
  };
@@ -230,12 +232,11 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.cpp
-@@ -0,0 +1,34 @@
+@@ -0,0 +1,32 @@
 +#include "qtrac.h"
 +
 +void qtrac::banner(FILE* out) {
-+fprintf(out, "\n");
-+fprintf(out, "\n");
++fprintf(out, ".                                                                                .\n");
 +fprintf(out, ".                                      >WWw,                                     .\n");
 +fprintf(out, ".                                       `)WWW                                    .\n");
 +fprintf(out, ".                                         )8WWu                ,uwu,             .\n");
@@ -261,8 +262,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.cpp
 +fprintf(out, ".                   Y88b.Y8b88P Y88b.  888    888  888 Y88b.                     .\n");
 +fprintf(out, ".                    'Y888888'   'Y888 888    'Y888888  'Y8888P                  .\n");
 +fprintf(out, ".                          Y8b                                                   .\n");
-+fprintf(out, "\n");
-+fprintf(out, "\n");
++fprintf(out, ".                                                                                .\n");
 +}
 +
 Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.h
