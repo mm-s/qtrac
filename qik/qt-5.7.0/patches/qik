@@ -28,7 +28,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,161 @@
+@@ -0,0 +1,170 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -79,6 +79,15 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +			output_socket=settings.value(QString::fromLatin1("output/socket")).toString();
 +		}
 +		if (debug) cout << "output_socket=" << output_socket.toStdString() << endl;
++	}
++
++
++	if (debug) {
++		QHash<QString, QVariant> hash;
++		const QStringList keys = settings->allKeys();
++		Q_FOREACH(QString key, keys) {
++		  hash[key] = settings->value(key());
++		}
 +	}
 +
 +/*
