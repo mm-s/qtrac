@@ -68,7 +68,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +
 +	{
 +		if (env.contains(QString::fromLatin1("QTRAC_OUTPUT_SOCKET"))) {
-+			output_socket=env.value(QString::fromLatin1("QTRAC_OUTPUT_SOCKET")).asString();
++			output_socket=env.value(QString::fromLatin1("QTRAC_OUTPUT_SOCKET"));
 +		}
 +		else {
 +			if (!settings.contains(QString::fromLatin1("output/socket")))
