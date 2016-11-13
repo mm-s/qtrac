@@ -51,7 +51,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +		qtrac::banner(stdout);
 +	}
 +
-+	QSettings settings("Qtrac", "qik");
++	QSettings settings(QString::fromLatin1("Qtrac"), QString::fromLatin1("qik"));
 +	{
 +		if (env.contains(QString::fromLatin1("QTRAC_OUTPUT_FILENAME"))) {
 +			output_filename=env.value(QString::fromLatin1("QTRAC_OUTPUT_FILENAME"));
@@ -60,7 +60,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +			if (!setting.contains(QString::fromLatin1("output/filename")))
 +				settings.setValue(QString::fromLatin1("output/filename"), QString::fromLatin1("qtrac.out")); //file
 +		
-+			output_filename=settings.value(QString::fromLatin1("output/filename")).asString();
++			output_filename=settings.value(QString::fromLatin1("output/filename")).toString();
 +		}
 +		if (debug) cout << "output_filename=" << output_filename.toStdString() << endl;
 +	}
@@ -72,7 +72,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +		else {
 +			if (!setting.contains(QString::fromLatin1("output/socket")))
 +				settings.setValue(QString::fromLatin1("output/socket"), QString::fromLatin1(""));
-+			output_socket=settings.value(QString::fromLatin1("output/socket")).asString();
++			output_socket=settings.value(QString::fromLatin1("output/socket")).toString();
 +		}
 +		if (debug) cout << "output_socket=" << output_socket.toStdString() << endl;
 +	}
