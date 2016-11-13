@@ -2,23 +2,25 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/global.pri
 ===================================================================
 --- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/corelib/global/global.pri
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/global.pri
-@@ -18,7 +18,8 @@ HEADERS +=  \
+@@ -18,7 +18,9 @@ HEADERS +=  \
          global/qtypetraits.h \
          global/qflags.h \
          global/qhooks_p.h \
 -        global/qversiontagging.h
 +        global/qversiontagging.h \
-+        global/qik.h
++        global/qik.h \
++        global/qtrac.h
  
  SOURCES += \
          global/archdetect.cpp \
-@@ -29,7 +30,8 @@ SOURCES += \
+@@ -29,7 +31,9 @@ SOURCES += \
          global/qnumeric.cpp \
          global/qlogging.cpp \
          global/qhooks.cpp \
 -        global/qversiontagging.cpp
 +        global/qversiontagging.cpp \
-+        global/qik.cpp
++        global/qik.cpp \
++        global/qtrac.cpp
  
  # qlibraryinfo.cpp includes qconfig.cpp
  INCLUDEPATH += $$QT_BUILD_TREE/src/corelib/global
