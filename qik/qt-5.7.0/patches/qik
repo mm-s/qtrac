@@ -47,7 +47,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +	return _qik_instance;
 +}
 +
-+void c::register(string data) {
++void c::log(string data) {
 +	Qt::HANDLE tid=QThread::currentThreadId();
 +	Q_UNUSED(tid);
 +}
@@ -91,7 +91,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
-@@ -0,0 +1,25 @@
+@@ -0,0 +1,26 @@
 +#ifndef QTRAC_QIK
 +#define QTRAC_QIK
 +
@@ -100,12 +100,13 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 +
 +namespace qtrac {
 +
++
 +class qik {
 +public:
 +	qik();
 +	~qik();
 +
-+	void register(std::string data);
++	void log(std::string data);
 +	static qik& instance();
 +
 +	void read_conf();
@@ -139,7 +140,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
              Q_ASSERT(!f.normalizedType.isEmpty());
              fprintf(out, "        case %d: ", methodindex);
 +            fprintf(out, "{\n          ");
-+            fprintf(out, "qtrac::qik::instance.register(\"%s\");\n          ",f.traceData().c_str());
++            fprintf(out, "qtrac::qik::instance.log(\"%s\");\n          ",f.traceData().c_str());
 +
              if (f.normalizedType != "void")
 -                fprintf(out, "{ %s _r = ", noRef(f.normalizedType).constData());
