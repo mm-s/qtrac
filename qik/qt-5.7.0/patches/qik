@@ -238,3 +238,15 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.h
  };
  Q_DECLARE_TYPEINFO(FunctionDef, Q_MOVABLE_TYPE);
  
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/bootstrap/bootstrap.pro
+===================================================================
+--- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/tools/bootstrap/bootstrap.pro
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/bootstrap/bootstrap.pro
+@@ -36,6 +36,7 @@ SOURCES += \
+            ../../corelib/global/qlogging.cpp \
+            ../../corelib/global/qmalloc.cpp \
+            ../../corelib/global/qnumeric.cpp \
++           ../../corelib/global/qik.cpp \
+            ../../corelib/io/qabstractfileengine.cpp \
+            ../../corelib/io/qbuffer.cpp \
+            ../../corelib/io/qdatastream.cpp \
