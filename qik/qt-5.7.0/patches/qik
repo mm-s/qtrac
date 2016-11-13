@@ -44,37 +44,37 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +
 +c::qik():debug(false) {
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
-+	if (env.contains("QTRAC_DEBUG")) {
++	if (env.contains(QString::fromAscii("QTRAC_DEBUG"))) {
 +		debug=true;
 +	}
-+	if (!env.contains("QTRAC_NOBANNER")) {
++	if (!env.contains(QString::fromAscii("QTRAC_NOBANNER"))) {
 +		qtrac::banner(stdout);
 +	}
 +
 +	QSettings settings("Qtrac", "qik");
 +	{
-+		if (env.contains("QTRAC_OUTPUT_FILENAME")) {
-+			output_filename=env.value("QTRAC_OUTPUT_FILENAME");
++		if (env.contains(QString::fromAscii("QTRAC_OUTPUT_FILENAME"))) {
++			output_filename=env.value(QString::fromAscii("QTRAC_OUTPUT_FILENAME"));
 +		}
 +		else {
-+			if (!setting.contains("output/filename"))
-+				settings.setValue("output/filename", "qtrac.out"); //file
++			if (!setting.contains(QString::fromAscii("output/filename")))
++				settings.setValue(QString::fromAscii("output/filename"), QString::fromAscii("qtrac.out")); //file
 +		
-+			output_filename=settings.getValue("output/filename").asString();
++			output_filename=settings.getValue(QString::fromAscii("output/filename")).asString();
 +		}
-+		if (debug) cout << "output_filename=" << output_filename << endl;
++		if (debug) cout << "output_filename=" << output_filename.toStdString() << endl;
 +	}
 +
 +	{
-+		if (env.contains("QTRAC_OUTPUT_SOCKET")) {
-+			output_socket=env.getValue("QTRAC_OUTPUT_SOCKET").asString();
++		if (env.contains(QString::fromAscii("QTRAC_OUTPUT_SOCKET"))) {
++			output_socket=env.value(QString::fromAscii("QTRAC_OUTPUT_SOCKET")).asString();
 +		}
 +		else {
-+			if (!setting.contains("output/socket"))
-+				settings.setValue("output/socket", "");
-+			output_socket=settings.getValue("output/socket").asString();
++			if (!setting.contains(QString::fromAscii("output/socket")))
++				settings.setValue(QString::fromAscii("output/socket"), QString::fromAscii(""));
++			output_socket=settings.getValue(QString::fromAscii("output/socket")).asString();
 +		}
-+		if (debug) cout << "output_socket=" << output_socket << endl;
++		if (debug) cout << "output_socket=" << output_socket.toStdString() << endl;
 +	}
 +}
 +
