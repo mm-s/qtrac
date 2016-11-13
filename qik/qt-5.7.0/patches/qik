@@ -28,7 +28,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,91 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -45,7 +45,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +
 +c _qik_instance;
 +
-+c::qik():debug(false) {
++c::qik():debug(false), socket(0) {
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
 +	if (env.contains(QString::fromLatin1("QTRAC_DEBUG"))) {
 +		debug=true;
@@ -79,6 +79,20 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +		}
 +		if (debug) cout << "output_socket=" << output_socket.toStdString() << endl;
 +	}
++
++/*
++	if (!output_socket.empty()) {
++   QByteArray data; // <-- fill with data
++
++    _pSocket = new QTcpSocket( this );
++    connect( _pSocket, SIGNAL(readyRead()), SLOT(readTcpData()) );
++
++    _pSocket->connectToHost("127.0.0.1", 9000);
++    if( _pSocket->waitForConnected() ) {
++        _pSocket->write( data );
++    }
++	}
++*/
 +}
 +
 +c::~qik() {
@@ -110,16 +124,18 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,31 @@
 +#ifndef QTRAC_QIK
 +#define QTRAC_QIK
 +
 +#include <string>
++#include <QTcpSocket>
++#include <QtCore/qglobal.h>
 +
 +namespace qtrac {
 +
 +
-+class qik {
++class Q_CORE_EXPORT qik {
 +public:
 +	qik();
 +	~qik();
@@ -132,6 +148,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 +	bool debug;
 +	QString output_filename;
 +	QString output_socket;
++	QTcpSocket* socket;
 +
 +};
 +
@@ -343,16 +360,17 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.h
-@@ -0,0 +1,16 @@
+@@ -0,0 +1,17 @@
 +#ifndef QTRAC_QTRAC
 +#define QTRAC_QTRAC
 +
 +#include <string>
 +#include <cstdio>
++#include <QtCore/qglobal.h>
 +
 +namespace qtrac {
 +
-+void banner(FILE*);
++void Q_CORE_EXPORT banner(FILE*);
 +
 +
 +}
