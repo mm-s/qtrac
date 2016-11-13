@@ -26,8 +26,9 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,19 @@
+@@ -0,0 +1,58 @@
 +#include "qik.h"
++#include <QThread>
 +
 +using namespace qtrac;
 +using namespace std;
@@ -46,13 +47,54 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +	return _qik_instance;
 +}
 +
++void c::register(string data) {
++	Qt::HANDLE tid=QThread::currentThreadId();
++	Q_UNUSED(tid);
++}
++
++void c::read_conf() {
++}
++
++void c::banner(FILE* out) {
++fprintf(out, "\n");
++fprintf(out, "                                      >WWw,                                     \n");
++fprintf(out, "                                       `%WWW                                    \n");
++fprintf(out, "                                         )8WWu                ,uwu,             \n");
++fprintf(out, "                                          88WWWu            yWWWWWWWW,          \n");
++fprintf(out, "                                           `8WWWWwu,       8#WWWWWWWW`          \n");
++fprintf(out, "                                             "8WWWWWWWWwwwWWWWWWWWW*`           \n");
++fprintf(out, "                                               `8WWWWWWWWWWWWWWWW*`             \n");
++fprintf(out, "                                                ##WWWWWWWWWWWW*`                \n");
++fprintf(out, "   ,,,ywu                                     y#WWWWWWWWWWWWWWWWWWWWWWWwwuuywwW8\n");
++fprintf(out, "WWWWWWWWWWWWWWWWWWwu,                       ,&#WWWWWWWWWWWWWWWWW%%WWWWWW%%%%%** \n");
++fprintf(out, " `^***%%%%WWWWWWWWWWWWWWwwu,,,,uwWWWWWWw,,uWWWWWWWWWWWWWWWWW`                   \n");
++fprintf(out, "            `*%%%WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW                     \n");
++fprintf(out, "                 `%WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                      \n");
++fprintf(out, "                    `*%%WWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                          \n");
++fprintf(out, "                        `*%%WWWWWWWWWWWWWWWWWWWW%*`                             \n");
++fprintf(out, "                             ^*%%%WWWWWWWWWW%*`                                 \n");
++fprintf(out, "                    .d88888b.  888                                              \n");
++fprintf(out, "                   d88P" "Y88b 888                                              \n");
++fprintf(out, "                   888     888 888                                              \n");
++fprintf(out, "                   888     888 888888 888d888 8888b.   .d8888b                  \n");
++fprintf(out, "                   888     888 888    888P"      "88b d88P"                     \n");
++fprintf(out, "                   888 Y8b 888 888    888    .d888888 888                       \n");
++fprintf(out, "                   Y88b.Y8b88P Y88b.  888    888  888 Y88b.                     \n");
++fprintf(out, "                    "Y888888"   "Y888 888    "Y888888  "Y8888P                  \n");
++fprintf(out, "                          Y8b                                                   \n");
++fprintf(out, "\n");
++fprintf(out, "\n");
++}
 Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
-@@ -0,0 +1,18 @@
+@@ -0,0 +1,25 @@
 +#ifndef QTRAC_QIK
 +#define QTRAC_QIK
++
++#include <string>
++#include <cstdio>
 +
 +namespace qtrac {
 +
@@ -61,11 +103,158 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 +	qik();
 +	~qik();
 +
-+
++	void register(std::string);
 +	static qik& instance();
++
++	void read_conf();
++
++	static vaid banner(FILE*);
 +};
 +
 +
 +}
 +
 +#endif
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/Qtrac
+===================================================================
+--- /dev/null
++++ qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/Qtrac
+@@ -0,0 +1,2 @@
++#include "qtrac.h"
++
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/qtrac.h
+===================================================================
+--- /dev/null
++++ qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/qtrac.h
+@@ -0,0 +1 @@
++#include "../../src/corelib/global/qik.h"
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
+===================================================================
+--- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/tools/moc/generator.cpp
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
+@@ -1158,8 +1158,11 @@ void Generator::generateStaticMetacall()
+             const FunctionDef &f = methodList.at(methodindex);
+             Q_ASSERT(!f.normalizedType.isEmpty());
+             fprintf(out, "        case %d: ", methodindex);
++            fprintf(out, "{\n          ");
++            fprintf(out, "qtrac::qik::instance.register(\"%s\");\n          ",f.traceData().c_str());
++
+             if (f.normalizedType != "void")
+-                fprintf(out, "{ %s _r = ", noRef(f.normalizedType).constData());
++                fprintf(out, "%s _r = ", noRef(f.normalizedType).constData());
+             fprintf(out, "_t->");
+             if (f.inPrivateClass.size())
+                 fprintf(out, "%s->", f.inPrivateClass.constData());
+@@ -1181,11 +1184,11 @@ void Generator::generateStaticMetacall()
+             }
+             fprintf(out, ");");
+             if (f.normalizedType != "void") {
+-                fprintf(out, "\n            if (_a[0]) *reinterpret_cast< %s*>(_a[0]) = _r; } ",
++                fprintf(out, "\n         if (_a[0]) *reinterpret_cast< %s*>(_a[0]) = _r;\n          ",
+                         noRef(f.normalizedType).constData());
+                 isUsed_a = true;
+             }
+-            fprintf(out, " break;\n");
++            fprintf(out, " break;\n          }\n");
+         }
+         fprintf(out, "        default: ;\n");
+         fprintf(out, "        }\n");
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
+===================================================================
+--- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/tools/moc/moc.cpp
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
+@@ -38,8 +38,16 @@
+ // for normalizeTypeInternal
+ #include <private/qmetaobject_moc_p.h>
+ 
++
++
+ QT_BEGIN_NAMESPACE
+ 
++std::string FunctionDef::traceData() const {
++	std::string data;
++	return data;
++}
++
++
+ // only moc needs this function
+ static QByteArray normalizeType(const QByteArray &ba, bool fixScope = false)
+ {
+@@ -870,7 +878,36 @@ void Moc::generate(FILE *out)
+     fprintf(out, "** Created by: The Qt Meta Object Compiler version %d (Qt %s)\n**\n" , mocOutputRevision, QT_VERSION_STR);
+     fprintf(out, "** WARNING! All changes made in this file will be lost!\n"
+             "*****************************************************************************/\n\n");
+-
++fprintf(out, "/*******************************************************************************\n"
++fprintf(out, "\n");
++fprintf(out, "                                      >WWw,                                     \n");
++fprintf(out, "                                       `%WWW                                    \n");
++fprintf(out, "                                         )8WWu                ,uwu,             \n");
++fprintf(out, "                                          88WWWu            yWWWWWWWW,          \n");
++fprintf(out, "                                           `8WWWWwu,       8#WWWWWWWW`          \n");
++fprintf(out, "                                             "8WWWWWWWWwwwWWWWWWWWW*`           \n");
++fprintf(out, "                                               `8WWWWWWWWWWWWWWWW*`             \n");
++fprintf(out, "                                                ##WWWWWWWWWWWW*`                \n");
++fprintf(out, "   ,,,ywu                                     y#WWWWWWWWWWWWWWWWWWWWWWWwwuuywwW8\n");
++fprintf(out, "WWWWWWWWWWWWWWWWWWwu,                       ,&#WWWWWWWWWWWWWWWWW%%WWWWWW%%%%%** \n");
++fprintf(out, " `^***%%%%WWWWWWWWWWWWWWwwu,,,,uwWWWWWWw,,uWWWWWWWWWWWWWWWWW`                   \n");
++fprintf(out, "            `*%%%WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW                     \n");
++fprintf(out, "                 `%WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                      \n");
++fprintf(out, "                    `*%%WWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                          \n");
++fprintf(out, "                        `*%%WWWWWWWWWWWWWWWWWWWW%*`                             \n");
++fprintf(out, "                             ^*%%%WWWWWWWWWW%*`                                 \n");
++fprintf(out, "                    .d88888b.  888                                              \n");
++fprintf(out, "                   d88P" "Y88b 888                                              \n");
++fprintf(out, "                   888     888 888                                              \n");
++fprintf(out, "                   888     888 888888 888d888 8888b.   .d8888b                  \n");
++fprintf(out, "                   888     888 888    888P"      "88b d88P"                     \n");
++fprintf(out, "                   888 Y8b 888 888    888    .d888888 888                       \n");
++fprintf(out, "                   Y88b.Y8b88P Y88b.  888    888  888 Y88b.                     \n");
++fprintf(out, "                    "Y888888"   "Y888 888    "Y888888  "Y8888P                  \n");
++fprintf(out, "                          Y8b                                                   \n");
++fprintf(out, "\n");
++fprintf(out, "\n");
++fprintf(out, "****************************************************************************/\n"
+ 
+     if (!noInclude) {
+         if (includePath.size() && !includePath.endsWith('/'))
+@@ -897,6 +934,7 @@ void Moc::generate(FILE *out)
+     for (const QByteArray &qtContainer : qtContainers)
+         fprintf(out, "#include <QtCore/%s>\n", qtContainer.constData());
+ 
++    fprintf(out, "#include <QtCore/Qtrac>\n");
+ 
+     fprintf(out, "#if !defined(Q_MOC_OUTPUT_REVISION)\n"
+             "#error \"The header file '%s' doesn't include <QObject>.\"\n", fn.constData());
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.h
+===================================================================
+--- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/tools/moc/moc.h
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.h
+@@ -38,6 +38,7 @@
+ #include <qjsonobject.h>
+ #include <stdio.h>
+ #include <ctype.h>
++#include <string>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -85,7 +86,7 @@ struct FunctionDef
+     FunctionDef(): returnTypeIsVolatile(false), access(Private), isConst(false), isVirtual(false), isStatic(false),
+                    inlineCode(false), wasCloned(false), isCompat(false), isInvokable(false),
+                    isScriptable(false), isSlot(false), isSignal(false), isPrivateSignal(false),
+-                   isConstructor(false), isDestructor(false), isAbstract(false), revision(0) {}
++                   isConstructor(false), isDestructor(false), isAbstract(false), revision(0), line(-1) {}
+     Type type;
+     QByteArray normalizedType;
+     QByteArray tag;
+@@ -114,6 +115,10 @@ struct FunctionDef
+     bool isAbstract;
+ 
+     int revision;
++
++	std::string file;
++	int line;
++	std::string traceData() const;
+ };
+ Q_DECLARE_TYPEINFO(FunctionDef, Q_MOVABLE_TYPE);
+ 
