@@ -26,7 +26,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,29 @@
 +#include "qik.h"
 +#include <QThread>
 +
@@ -55,48 +55,16 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +void c::read_conf() {
 +}
 +
-+void c::banner(FILE* out) {
-+fprintf(out, "\n");
-+fprintf(out, "\n");
-+fprintf(out, "                                      >WWw,                                     \n");
-+fprintf(out, "                                       `%WWW                                    \n");
-+fprintf(out, "                                         )8WWu                ,uwu,             \n");
-+fprintf(out, "                                          88WWWu            yWWWWWWWW,          \n");
-+fprintf(out, "                                           `8WWWWwu,       8#WWWWWWWW`          \n");
-+fprintf(out, "                                             '8WWWWWWWWwwwWWWWWWWWW*`           \n");
-+fprintf(out, "                                               `8WWWWWWWWWWWWWWWW*`             \n");
-+fprintf(out, "                                                ##WWWWWWWWWWWW*`                \n");
-+fprintf(out, "   ,,,ywu                                     y#WWWWWWWWWWWWWWWWWWWWWWWwwuuywwW8\n");
-+fprintf(out, "WWWWWWWWWWWWWWWWWWwu,                       ,&#WWWWWWWWWWWWWWWWW%%WWWWWW%%%%%** \n");
-+fprintf(out, " `^***%%%%WWWWWWWWWWWWWWwwu,,,,uwWWWWWWw,,uWWWWWWWWWWWWWWWWW`                   \n");
-+fprintf(out, "            `*%%%WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW                     \n");
-+fprintf(out, "                 `%WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                      \n");
-+fprintf(out, "                    `*%%WWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                          \n");
-+fprintf(out, "                        `*%%WWWWWWWWWWWWWWWWWWWW%*`                             \n");
-+fprintf(out, "                             ^*%%%WWWWWWWWWW%*`                                 \n");
-+fprintf(out, "                    .d88888b.  888                                              \n");
-+fprintf(out, "                   d88P' 'Y88b 888                                              \n");
-+fprintf(out, "                   888     888 888                                              \n");
-+fprintf(out, "                   888     888 888888 888d888 8888b.   .d8888b                  \n");
-+fprintf(out, "                   888     888 888    888P'      '88b d88P'                     \n");
-+fprintf(out, "                   888 Y8b 888 888    888    .d888888 888                       \n");
-+fprintf(out, "                   Y88b.Y8b88P Y88b.  888    888  888 Y88b.                     \n");
-+fprintf(out, "                    'Y888888'   'Y888 888    'Y888888  'Y8888P                  \n");
-+fprintf(out, "                          Y8b                                                   \n");
-+fprintf(out, "\n");
-+fprintf(out, "\n");
-+}
 +
 Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,24 @@
 +#ifndef QTRAC_QIK
 +#define QTRAC_QIK
 +
 +#include <string>
-+#include <cstdio>
 +
 +namespace qtrac {
 +
@@ -111,7 +79,6 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 +
 +	void read_conf();
 +
-+	static void banner(FILE*);
 +};
 +
 +
@@ -129,8 +96,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/qtrac.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/qtrac.h
-@@ -0,0 +1 @@
+@@ -0,0 +1,3 @@
 +#include "../../src/corelib/global/qik.h"
++#include "../../src/corelib/global/qtrac.h"
++
 Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
 ===================================================================
 --- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/tools/moc/generator.cpp
@@ -170,7 +139,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
  #include <QtCore/qfile.h>
  #include <QtCore/qfileinfo.h>
  #include <QtCore/qdir.h>
-+#include <QtCore/qtrac.h>
++#include <QtCore/qtrac_bootstrap.h>
  
  // for normalizeTypeInternal
  #include <private/qmetaobject_moc_p.h>
@@ -193,7 +162,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
              "*****************************************************************************/\n\n");
  
 +fprintf(out, "/*******************************************************************************\n");
-+qtrac::qik::banner(out);
++qtrac::banner(out);
 +fprintf(out, "  *****************************************************************************/\n");
  
      if (!noInclude) {
@@ -246,7 +215,74 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/bootstrap/bootstrap.p
             ../../corelib/global/qlogging.cpp \
             ../../corelib/global/qmalloc.cpp \
             ../../corelib/global/qnumeric.cpp \
-+           ../../corelib/global/qik.cpp \
++           ../../corelib/global/qtrac.cpp \
             ../../corelib/io/qabstractfileengine.cpp \
             ../../corelib/io/qbuffer.cpp \
             ../../corelib/io/qdatastream.cpp \
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/qtrac_bootstrap.h
+===================================================================
+--- /dev/null
++++ qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/qtrac_bootstrap.h
+@@ -0,0 +1,2 @@
++#include "../../src/corelib/global/qtrac.h"
++
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.cpp
+===================================================================
+--- /dev/null
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.cpp
+@@ -0,0 +1,34 @@
++#include "qtrac.h"
++
++void qtrac::banner(FILE* out) {
++fprintf(out, "\n");
++fprintf(out, "\n");
++fprintf(out, "                                      >WWw,                                     \n");
++fprintf(out, "                                       `%WWW                                    \n");
++fprintf(out, "                                         )8WWu                ,uwu,             \n");
++fprintf(out, "                                          88WWWu            yWWWWWWWW,          \n");
++fprintf(out, "                                           `8WWWWwu,       8#WWWWWWWW`          \n");
++fprintf(out, "                                             '8WWWWWWWWwwwWWWWWWWWW*`           \n");
++fprintf(out, "                                               `8WWWWWWWWWWWWWWWW*`             \n");
++fprintf(out, "                                                ##WWWWWWWWWWWW*`                \n");
++fprintf(out, "   ,,,ywu                                     y#WWWWWWWWWWWWWWWWWWWWWWWwwuuywwW>\n");
++fprintf(out, "WWWWWWWWWWWWWWWWWWwu,                       ,&#WWWWWWWWWWWWWWWWW%%WWWWW%%%%%**^ \n");
++fprintf(out, " `^***%%%%WWWWWWWWWWWWWWwwu,,,,uwWWWWWWw,,uWWWWWWWWWWWWWWWWW`                   \n");
++fprintf(out, "            `*%%%WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW                     \n");
++fprintf(out, "                 `%WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                      \n");
++fprintf(out, "                    `*%%WWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                          \n");
++fprintf(out, "                        `*%%WWWWWWWWWWWWWWWWWWWW%*`                             \n");
++fprintf(out, "                             ^*%%%WWWWWWWWWW%*`                                 \n");
++fprintf(out, "                    .d88888b.  888                                              \n");
++fprintf(out, "                   d88P' 'Y88b 888                                              \n");
++fprintf(out, "                   888     888 888                                              \n");
++fprintf(out, "                   888     888 888888 888d888 8888b.   .d8888b                  \n");
++fprintf(out, "                   888     888 888    888P'      '88b d88P'                     \n");
++fprintf(out, "                   888 Y8b 888 888    888    .d888888 888                       \n");
++fprintf(out, "                   Y88b.Y8b88P Y88b.  888    888  888 Y88b.                     \n");
++fprintf(out, "                    'Y888888'   'Y888 888    'Y888888  'Y8888P                  \n");
++fprintf(out, "                          Y8b                                                   \n");
++fprintf(out, "\n");
++fprintf(out, "\n");
++}
++
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.h
+===================================================================
+--- /dev/null
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.h
+@@ -0,0 +1,16 @@
++#ifndef QTRAC_QTRAC
++#define QTRAC_QTRAC
++
++#include <string>
++#include <cstdio>
++
++namespace qtrac {
++
++void banner(FILE*);
++
++
++}
++
++#endif
++
++
