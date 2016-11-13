@@ -112,7 +112,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
              Q_ASSERT(!f.normalizedType.isEmpty());
              fprintf(out, "        case %d: ", methodindex);
 +            fprintf(out, "{\n          ");
-+            fprintf(out, "qtrac::qik::instance().log(\"%s\");\n          ",f.traceData().c_str());
++            fprintf(out, "qtrac::qik::instance().log(\"%s\");\n          ",f.traceData(*cdef,_o).c_str());
 +
              if (f.normalizedType != "void")
 -                fprintf(out, "{ %s _r = ", noRef(f.normalizedType).constData());
@@ -138,11 +138,12 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
 ===================================================================
 --- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/tools/moc/moc.cpp
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
-@@ -34,12 +34,21 @@
+@@ -34,12 +34,26 @@
  #include <QtCore/qfile.h>
  #include <QtCore/qfileinfo.h>
  #include <QtCore/qdir.h>
 +#include <QtCore/qtrac_bootstrap.h>
++#include <sstream>
  
  // for normalizeTypeInternal
  #include <private/qmetaobject_moc_p.h>
@@ -151,16 +152,30 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
 +
  QT_BEGIN_NAMESPACE
  
-+std::string FunctionDef::traceData() const {
-+	std::string data;
-+	return data;
++std::string FunctionDef::traceData(const ClassDef& cd, void* p) const {
++	ostringstream os;
++	if (isSignal) os << "N";
++	elseif (isSlot) os << "T";
++	else os << "?";
++    os << " " << p << " " << cd.classname.toStdString() << "::" << name.toStdString() << "(" << arguments.size() << ") " << file.toStdString() << ":" << line;
++	return os.str();
 +}
 +
 +
  // only moc needs this function
  static QByteArray normalizeType(const QByteArray &ba, bool fixScope = false)
  {
-@@ -871,6 +880,9 @@ void Moc::generate(FILE *out)
+@@ -419,7 +433,8 @@ bool Moc::parseFunction(FunctionDef *def
+     }
+ 
+     def->normalizedType = normalizeType(def->type.name);
+-
++	def->file=filename;
++	def->line=symbols[index].lineNum;
+     if (!test(RPAREN)) {
+         parseFunctionArguments(def);
+         next(RPAREN);
+@@ -871,6 +886,9 @@ void Moc::generate(FILE *out)
      fprintf(out, "** WARNING! All changes made in this file will be lost!\n"
              "*****************************************************************************/\n\n");
  
@@ -170,7 +185,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
  
      if (!noInclude) {
          if (includePath.size() && !includePath.endsWith('/'))
-@@ -897,6 +909,7 @@ void Moc::generate(FILE *out)
+@@ -897,6 +915,7 @@ void Moc::generate(FILE *out)
      for (const QByteArray &qtContainer : qtContainers)
          fprintf(out, "#include <QtCore/%s>\n", qtContainer.constData());
  
@@ -190,7 +205,14 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.h
  
  QT_BEGIN_NAMESPACE
  
-@@ -85,7 +86,7 @@ struct FunctionDef
+@@ -80,12 +81,14 @@ struct ArgumentDef
+ };
+ Q_DECLARE_TYPEINFO(ArgumentDef, Q_MOVABLE_TYPE);
+ 
++struct ClassDef;
++
+ struct FunctionDef
+ {
      FunctionDef(): returnTypeIsVolatile(false), access(Private), isConst(false), isVirtual(false), isStatic(false),
                     inlineCode(false), wasCloned(false), isCompat(false), isInvokable(false),
                     isScriptable(false), isSlot(false), isSignal(false), isPrivateSignal(false),
@@ -199,14 +221,14 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.h
      Type type;
      QByteArray normalizedType;
      QByteArray tag;
-@@ -114,6 +115,10 @@ struct FunctionDef
+@@ -114,6 +117,10 @@ struct FunctionDef
      bool isAbstract;
  
      int revision;
 +
-+	QString file;
++	QByteArray file;
 +	int line;
-+	std::string traceData() const;
++	std::string traceData(const ClassDef&, void*) const;
  };
  Q_DECLARE_TYPEINFO(FunctionDef, Q_MOVABLE_TYPE);
  
