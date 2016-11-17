@@ -28,7 +28,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,170 @@
+@@ -0,0 +1,173 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -90,6 +90,8 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +		}
 +	}
 +
++	connect_socket();
++
 +/*
 +	if (!output_socket.empty()) {
 +   QByteArray data; // <-- fill with data
@@ -113,10 +115,11 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +	return _qik_instance;
 +}
 +
-+void c::log(string data, void* o) {
++void c::log(string data, void* sender, void* receiver) {
++//todo sync threads
 +	Qt::HANDLE tid=QThread::currentThreadId();
 +	ostringstream os;
-+	os << tid << " " << o << " " << data << endl;
++	os << tid << " " << sender << " " << receiver << " " << data << endl;
 +
 +	if (sockfd==0) return;
 +	string sbuff=os.str();
@@ -159,7 +162,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +
 +}
 +
-+void c::connect() {
++void c::connect_socket() {
 +
 +    struct sockaddr_in serv_addr;
 +    struct hostent *server;
@@ -219,12 +222,12 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 +	qik();
 +	~qik();
 +
-+	void log(std::string data, void*);
++	void log(std::string data, void* sender, void* receiver);
 +	static qik& instance();
 +
 +private:
 +	void read_conf();
-+	void connect();
++	void connect_socket();
 +	void disconnect();
 +	void error(string err);
 +
@@ -263,7 +266,7 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
              Q_ASSERT(!f.normalizedType.isEmpty());
              fprintf(out, "        case %d: ", methodindex);
 +            fprintf(out, "{\n          ");
-+            fprintf(out, "qtrac::qik::instance().log(\"%s\",_o);\n          ",f.traceData(*cdef).c_str());
++            fprintf(out, "qtrac::qik::instance().log(\"%s\",_o->sender(),_o);\n          ",f.traceData(*cdef).c_str());
 +
              if (f.normalizedType != "void")
 -                fprintf(out, "{ %s _r = ", noRef(f.normalizedType).constData());
