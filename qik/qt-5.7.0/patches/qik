@@ -464,3 +464,18 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.h
 +#endif
 +
 +
+Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/kernel/qobject.h
+===================================================================
+--- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/corelib/kernel/qobject.h
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/kernel/qobject.h
+@@ -422,8 +422,9 @@ public:
+ public Q_SLOTS:
+     void deleteLater();
+ 
+-protected:
++public:
+     QObject *sender() const;
++protected:
+     int senderSignalIndex() const;
+     int receivers(const char* signal) const;
+     bool isSignalConnected(const QMetaMethod &signal) const;
