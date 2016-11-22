@@ -321,3 +321,168 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/global.pr
  
  # qlibraryinfo.cpp includes qconfig.cpp
  INCLUDEPATH += $$QT_BUILD_TREE/src/corelib/global
+Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/generator.cpp
+===================================================================
+--- qt-everywhere-opensource-src-4.7.4-qtrac-1.0.orig/src/tools/moc/generator.cpp
++++ qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/generator.cpp
+@@ -662,8 +662,11 @@ void Generator::generateMetacall()
+         for (int methodindex = 0; methodindex < methodList.size(); ++methodindex) {
+             const FunctionDef &f = methodList.at(methodindex);
+             fprintf(out, "        case %d: ", methodindex);
++            fprintf(out, "{\n          ");
++            fprintf(out, "qtrac::qik::instance().log(\"%s\",0,this);\n          ",f.traceData(*cdef).c_str());
++
+             if (f.normalizedType.size())
+-                fprintf(out, "{ %s _r = ", noRef(f.normalizedType).constData());
++                fprintf(out, " %s _r = ", noRef(f.normalizedType).constData());
+             if (f.inPrivateClass.size())
+                 fprintf(out, "%s->", f.inPrivateClass.constData());
+             fprintf(out, "%s(", f.name.constData());
+@@ -676,9 +679,9 @@ void Generator::generateMetacall()
+             }
+             fprintf(out, ");");
+             if (f.normalizedType.size())
+-                fprintf(out, "\n            if (_a[0]) *reinterpret_cast< %s*>(_a[0]) = _r; } ",
++                fprintf(out, "\n            if (_a[0]) *reinterpret_cast< %s*>(_a[0]) = _r; ",
+                         noRef(f.normalizedType).constData());
+-            fprintf(out, " break;\n");
++            fprintf(out, " break;}\n");
+         }
+         fprintf(out, "        default: ;\n");
+         fprintf(out, "        }\n");
+@@ -956,6 +959,7 @@ void Generator::generateSignal(FunctionD
+ 
+     if (def->arguments.isEmpty() && def->normalizedType.isEmpty()) {
+         fprintf(out, ")%s\n{\n"
++	        "    qtrac::qik::instance().log(\"%s\",this,0);\n",def->traceData(*cdef).c_str());
+                 "    QMetaObject::activate(%s, &staticMetaObject, %d, 0);\n"
+                 "}\n", constQualifier, thisPtr.constData(), index);
+         return;
+Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/README
+===================================================================
+--- qt-everywhere-opensource-src-4.7.4-qtrac-1.0.orig/README
++++ qt-everywhere-opensource-src-4.7.4-qtrac-1.0/README
+@@ -1,3 +1,11 @@
++WARNING
++=======
++ This package has been patched with Qtrac.
++
++ Don't use the generated Qt libraries in
++ a production environment, it is only suitable
++ for analysis or debugging purposes.
++
+ This is Qt version 4.7.4.
+ 
+ Qt is a comprehensive cross-platform C++ application framework. Qt 4
+Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/bootstrap/bootstrap.pro
+===================================================================
+--- qt-everywhere-opensource-src-4.7.4-qtrac-1.0.orig/src/tools/bootstrap/bootstrap.pro
++++ qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/bootstrap/bootstrap.pro
+@@ -50,6 +50,7 @@ SOURCES += \
+            ../../corelib/global/qglobal.cpp \
+            ../../corelib/global/qmalloc.cpp \
+            ../../corelib/global/qnumeric.cpp \
++           ../../corelib/global/qtrac.cpp \
+            ../../corelib/io/qabstractfileengine.cpp \
+            ../../corelib/io/qbuffer.cpp \
+            ../../corelib/io/qdatastream.cpp \
+Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/moc.cpp
+===================================================================
+--- qt-everywhere-opensource-src-4.7.4-qtrac-1.0.orig/src/tools/moc/moc.cpp
++++ qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/moc.cpp
+@@ -44,12 +44,25 @@
+ #include "qdatetime.h"
+ #include "utils.h"
+ #include "outputrevision.h"
++#include <QtCore/qtrac_bootstrap.h>
++#include <sstream>
+ 
+ // for normalizeTypeInternal
+ #include <private/qmetaobject_p.h>
+ 
+ QT_BEGIN_NAMESPACE
+ 
++std::string FunctionDef::traceData(const ClassDef& cd) const {
++	std::ostringstream os;
++	if (isSignal) os << "S";
++	else if (isPrivateSignal) os << "s";
++	else if (isSlot) os << "T";
++	else os << "?";
++    os << " " << cd.classname.toStdString() << "::" << name.toStdString() << "(" << arguments.size() << ") " << file.toStdString() << ":" << line;
++	return os.str();
++}
++
++
+ // only moc needs this function
+ static QByteArray normalizeType(const char *s, bool fixScope = false)
+ {
+@@ -401,6 +414,9 @@ bool Moc::parseFunction(FunctionDef *def
+ 
+     def->normalizedType = normalizeType(def->type.name);
+ 
++    def->file=filename;
++    def->line=symbols[index].lineNum;
++
+     if (!test(RPAREN)) {
+         parseFunctionArguments(def);
+         next(RPAREN);
+@@ -777,6 +793,9 @@ void Moc::generate(FILE *out)
+     fprintf(out, "** WARNING! All changes made in this file will be lost!\n"
+             "*****************************************************************************/\n\n");
+ 
++    fprintf(out, "/*\n");
++    qtrac::banner(out);
++    fprintf(out, "*/\n");
+ 
+     if (!noInclude) {
+         if (includePath.size() && !includePath.endsWith('/'))
+@@ -797,6 +816,8 @@ void Moc::generate(FILE *out)
+     if (mustIncludeQMetaTypeH)
+         fprintf(out, "#include <QtCore/qmetatype.h>\n");
+ 
++    fprintf(out, "#include <QtCore/Qtrac>\n");
++
+     fprintf(out, "#if !defined(Q_MOC_OUTPUT_REVISION)\n"
+             "#error \"The header file '%s' doesn't include <QObject>.\"\n", (const char *)fn);
+     fprintf(out, "#elif Q_MOC_OUTPUT_REVISION != %d\n", mocOutputRevision);
+Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/moc.h
+===================================================================
+--- qt-everywhere-opensource-src-4.7.4-qtrac-1.0.orig/src/tools/moc/moc.h
++++ qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/moc.h
+@@ -48,6 +48,7 @@
+ #include <QPair>
+ #include <stdio.h>
+ #include <ctype.h>
++#include <string>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -81,12 +82,15 @@ struct ArgumentDef
+     bool isDefault;
+ };
+ 
++struct ClassDef;
++
+ struct FunctionDef
+ {
+     FunctionDef(): returnTypeIsVolatile(false), access(Private), isConst(false), isVirtual(false),
+                    inlineCode(false), wasCloned(false), isCompat(false), isInvokable(false),
+                    isScriptable(false), isSlot(false), isSignal(false),
+-                   isConstructor(false), isDestructor(false), isAbstract(false), revision(0) {}
++                   isConstructor(false), isDestructor(false), isAbstract(false), revision(0), line(-1) {}
++
+     Type type;
+     QByteArray normalizedType;
+     QByteArray tag;
+@@ -113,6 +117,11 @@ struct FunctionDef
+     bool isAbstract;
+ 
+     int revision;
++
++    QByteArray file;
++    int line;
++    std::string traceData(const ClassDef&) const;
++
+ };
+ 
+ struct PropertyDef
