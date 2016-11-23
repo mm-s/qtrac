@@ -97,7 +97,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +	return _qik_instance;
 +}
 +
-+void c::log(string data, void* sender, void* receiver) { //data is "s QFileSystemWatcher::fileChanged(1) io/qfilesystemwatcher.h:71"
++void c::log(string data, const void* sender, const void* receiver) { //data is "s QFileSystemWatcher::fileChanged(1) io/qfilesystemwatcher.h:71"
 +//todo sync threads
 +	Qt::HANDLE tid=QThread::currentThreadId();
 +	ostringstream os;
@@ -196,7 +196,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.h
 +	qik();
 +	~qik();
 +
-+	void log(std::string data, void* sender, void* receiver);
++	void log(std::string data, const void* sender, const void* receiver);
 +	static qik& instance();
 +
 +private:
@@ -279,13 +279,12 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qtrac.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qtrac.h
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,16 @@
 +#ifndef QTRAC_QTRAC
 +#define QTRAC_QTRAC
 +
-+#include <string>
-+#include <cstdio>
 +#include <QtCore/qglobal.h>
++#include <stdio.h>
 +
 +namespace qtrac {
 +
@@ -510,3 +509,18 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/configure
      fi
  fi
  QT_INSTALL_PREFIX=`"$relpath/config.tests/unix/makeabs" "$QT_INSTALL_PREFIX"`
+Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/3rdparty/webkit/WebCore/platform/qt/SharedTimerQt.cpp
+===================================================================
+--- qt-everywhere-opensource-src-4.7.4-qtrac-1.0.orig/src/3rdparty/webkit/WebCore/platform/qt/SharedTimerQt.cpp
++++ qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/3rdparty/webkit/WebCore/platform/qt/SharedTimerQt.cpp
+@@ -141,8 +141,9 @@ void stopSharedTimer()
+     SharedTimerQt::inst()->stop();
+ }
+ 
+-#include "SharedTimerQt.moc"
+ 
+ }
+ 
++#include "SharedTimerQt.moc"
++
+ // vim: ts=4 sw=4 et
