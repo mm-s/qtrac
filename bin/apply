@@ -1,21 +1,53 @@
 #!/bin/bash
 
-if [ $1 -eq "" ]; then
-	echo "please specify the directory where qt-everywhere has been unpacked"
+tgz=$1
+
+if [ $tgz -eq "" ]; then
+	echo "please specify the qt-everywhere tarball file (qt-everywhere-*-src-*.tar.gz)"
 	exit 1
 fi
 
 BIN="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-echo $BIN
+#echo $BIN
 
-cd $1
+if [ ! -f $1 ]; then
+	echo "I cannot find the supplied file. Aborting."
+	exit 1
+fi
+
+qtdir=`echo $tgz | sed "s/\(.*\).tar.gz/\1/"
+
+if [ -d $qtdir ]; then
+	echo "A directory named $qtdir already exists. Aborting."
+	exit 1
+fi
+
+tar -xzf $tgz
+if [ ! $? -eq 0 ]; then
+	echo "I found errors uncompressing the supplied file. Aborting."
+	exit 1
+fi
+
+if [ ! -d $qtdir ]; then
+	echo "A directory named $qtdir cannot be found after unpacking $tgz. Aborting."
+	exit 1
+fi
+
+quiltv=`quilt --version`
+if [ ! $? -eq 0 ]; then
+	echo "quilt must be installed in your system in order to proceed. Aborting"
+	echo "see https://en.wikipedia.org/wiki/Quilt_%28software%29"
+	exit 1
+fi
+
+echo "using quilt version $quiltv"
+
+cd $qtdir
 
 pwd=`pwd`
 
-
-echo '     Qtrac is about to patch your Qt source package at:'
-echo "     $pwd"
-echo ''
+echo "     Qtrac is about to patch your Qt source package at $pwd"
+echo ""
 
 licence=`echo $pwd | sed 's/.*qt-everywhere-\([a-z]*\)-src-.*/\1/'`
 version=`echo $pwd | sed 's/.*qt-everywhere-[a-z]*-src-\(.*\)/\1/'`
@@ -36,7 +68,7 @@ if [ ! -d $BIN/../qik/qt-$version ]; then
 fi
 
 if [ -d patches ]; then
-	echo "Error: this copy of Qt has been already patched."
+	echo "Error: this copy of Qt has been already patched (it contains patches directory)."
 	exit 1
 fi
 cp $BIN/../qik/qt-$version/patches . -R
