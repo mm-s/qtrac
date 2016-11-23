@@ -21,6 +21,13 @@ if [ -d $qtdir ]; then
 	echo "A directory named $qtdir already exists. Aborting."
 	exit 1
 fi
+qtracversion="1.0"
+finalqtdir=${qtdir}-qtrac-$qtracversion
+if [ -d $finalqtdir ]; then
+	echo "A directory named $finalqtdir already exists. Aborting."
+	exit 1
+fi
+
 
 tar -xzf $tgz
 if [ ! $? -eq 0 ]; then
@@ -111,11 +118,10 @@ echo '.                                                                         
 
 
 echo "Congratulations!"
-echo "Your instrumented copy of Qt is ready to be compiled at "
-echo "$1-qtrac-1.0"
-echo "See $1-qtrac-1.0/README"
+echo "Your instrumented copy of Qt is ready to be compiled at $finalqtdir"
+echo "See $finalqtdir/README for building instructions."
 echo ""
-echo "Thanks for using Qtrac, always more at https://github.com/mm-s/qtrac/wiki"
+echo "Thanks for choosing Qtrac, always more at https://github.com/mm-s/qtrac/wiki"
 echo "Consider upgrading to Qtrac-Pro, learn more at http://qtrac.org"
 echo ""
 
