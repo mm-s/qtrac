@@ -11,6 +11,14 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +#include <sstream>
 +#include <iostream>
 +#include <QProcessEnvironment>
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <string.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <netdb.h>
 +
 +using namespace qtrac;
 +using namespace std;
@@ -22,7 +30,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +c::qik():debug(0) {
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
 +	if (env.contains(QString::fromLatin1("QTRAC_DEBUG"))) {
-+		debug=new QFile("qtrac.log");
++		debug=new QFile(QString::fromLatin1("qtrac.log"));
 +	}
 +	if (!env.contains(QString::fromLatin1("QTRAC_NOBANNER"))) {
 +		qtrac::banner(stdout);
@@ -58,9 +66,9 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +
 +	if (debug) {
 +		QHash<QString, QVariant> hash;
-+		const QStringList keys = settings->allKeys();
++		const QStringList keys = settings.allKeys();
 +		Q_FOREACH(QString key, keys) {
-+		  hash[key] = settings->value(key());
++		  hash[key] = settings.value(key);
 +		}
 +	}
 +
@@ -123,15 +131,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +
 +}
 +
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <string.h>
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+#include <netinet/in.h>
-+#include <netdb.h>
-+void c::error(string err) {
++void c::error(string ) {
 +	if (!debug) return;
 +
 +}
@@ -141,14 +141,14 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +    struct sockaddr_in serv_addr;
 +    struct hostent *server;
 +
-+    char buffer[256];
++//    char buffer[256];
 +    sockfd = socket(AF_INET, SOCK_STREAM, 0);
 +    if (sockfd < 0) {
 +        error("ERROR opening socket");
 +		sockfd=0;
 +		return;
 +	}
-+    server = gethostbyname(host.constData());
++    server = gethostbyname(host.toUtf8().constData());
 +    if (server == 0) {
 +	    close(sockfd);
 +		sockfd=0;
@@ -350,14 +350,17 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/generator.cpp
          }
          fprintf(out, "        default: ;\n");
          fprintf(out, "        }\n");
-@@ -956,6 +959,7 @@ void Generator::generateSignal(FunctionD
+@@ -956,8 +959,9 @@ void Generator::generateSignal(FunctionD
  
      if (def->arguments.isEmpty() && def->normalizedType.isEmpty()) {
          fprintf(out, ")%s\n{\n"
-+	        "    qtrac::qik::instance().log(\"%s\",this,0);\n",def->traceData(*cdef).c_str());
++	        "    qtrac::qik::instance().log(\"%s\",this,0);\n"
                  "    QMetaObject::activate(%s, &staticMetaObject, %d, 0);\n"
-                 "}\n", constQualifier, thisPtr.constData(), index);
+-                "}\n", constQualifier, thisPtr.constData(), index);
++                "}\n", constQualifier, def->traceData(*cdef).c_str(), thisPtr.constData(), index);
          return;
+     }
+ 
 Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/README
 ===================================================================
 --- qt-everywhere-opensource-src-4.7.4-qtrac-1.0.orig/README
@@ -390,7 +393,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/moc.cpp
 ===================================================================
 --- qt-everywhere-opensource-src-4.7.4-qtrac-1.0.orig/src/tools/moc/moc.cpp
 +++ qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/moc.cpp
-@@ -44,12 +44,25 @@
+@@ -44,12 +44,24 @@
  #include "qdatetime.h"
  #include "utils.h"
  #include "outputrevision.h"
@@ -405,10 +408,9 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/moc.cpp
 +std::string FunctionDef::traceData(const ClassDef& cd) const {
 +	std::ostringstream os;
 +	if (isSignal) os << "S";
-+	else if (isPrivateSignal) os << "s";
 +	else if (isSlot) os << "T";
 +	else os << "?";
-+    os << " " << cd.classname.toStdString() << "::" << name.toStdString() << "(" << arguments.size() << ") " << file.toStdString() << ":" << line;
++        os << " " << cd.classname.data() << "::" << name.data() << "(" << arguments.size() << ") " << file.data() << ":" << line;
 +	return os.str();
 +}
 +
@@ -416,7 +418,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/moc.cpp
  // only moc needs this function
  static QByteArray normalizeType(const char *s, bool fixScope = false)
  {
-@@ -401,6 +414,9 @@ bool Moc::parseFunction(FunctionDef *def
+@@ -401,6 +413,9 @@ bool Moc::parseFunction(FunctionDef *def
  
      def->normalizedType = normalizeType(def->type.name);
  
@@ -426,7 +428,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/moc.cpp
      if (!test(RPAREN)) {
          parseFunctionArguments(def);
          next(RPAREN);
-@@ -777,6 +793,9 @@ void Moc::generate(FILE *out)
+@@ -777,6 +792,9 @@ void Moc::generate(FILE *out)
      fprintf(out, "** WARNING! All changes made in this file will be lost!\n"
              "*****************************************************************************/\n\n");
  
@@ -436,7 +438,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/tools/moc/moc.cpp
  
      if (!noInclude) {
          if (includePath.size() && !includePath.endsWith('/'))
-@@ -797,6 +816,8 @@ void Moc::generate(FILE *out)
+@@ -797,6 +815,8 @@ void Moc::generate(FILE *out)
      if (mustIncludeQMetaTypeH)
          fprintf(out, "#include <QtCore/qmetatype.h>\n");
  
