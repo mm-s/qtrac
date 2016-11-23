@@ -1,9 +1,10 @@
 #!/bin/bash
 
-tgz=$1
+input=$1
 
-if [ "x$tgz" == "x" ]; then
+if [ "x$input" == "x" ]; then
 	echo "please specify the qt-everywhere tarball file (qt-everywhere-*-src-*.tar.gz)"
+	echo "if you have a file with another extension you can uncompress it manually and specify the resulting directory intead of a tar.gz file."
 	exit 1
 fi
 
@@ -11,16 +12,22 @@ BIN="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #echo $BIN
 
 if [ ! -f $1 ]; then
-	echo "I cannot find the supplied file. Aborting."
-	exit 1
+	if [ -d $1 ]; then
+		qtdir=$input
+		tgz=""
+	else
+		echo "I cannot find the supplied file. Aborting."
+		exit 1
+	fi
+else
+	tgz=$input
+	qtdir=`echo $input | sed "s/\(.*\).tar.gz/\1/"`
+	if [ -d $qtdir ]; then
+		echo "A directory named $qtdir already exists. Aborting."
+		exit 1
+	fi
 fi
 
-qtdir=`echo $tgz | sed "s/\(.*\).tar.gz/\1/"`
-
-if [ -d $qtdir ]; then
-	echo "A directory named $qtdir already exists. Aborting."
-	exit 1
-fi
 qtracversion="1.0"
 finalqtdir=${qtdir}-qtrac-$qtracversion
 if [ -d $finalqtdir ]; then
@@ -37,15 +44,17 @@ fi
 
 echo "using quilt version $quiltv"
 
-echo "uncompressing $tgz..."
-tar -xzf $tgz
-if [ ! $? -eq 0 ]; then
-	echo "I found errors uncompressing the supplied file. Aborting."
-	exit 1
+if [ "x$tgz" != "x" ]; then
+	echo "uncompressing $tgz..."
+	tar -xzf $tgz
+	if [ ! $? -eq 0 ]; then
+		echo "I found errors uncompressing the supplied file. Aborting."
+		exit 1
+	fi
 fi
 
 if [ ! -d $qtdir ]; then
-	echo "A directory named $qtdir cannot be found after unpacking $tgz. Aborting."
+	echo "A directory named $qtdir cannot be found. Aborting."
 	exit 1
 fi
 
