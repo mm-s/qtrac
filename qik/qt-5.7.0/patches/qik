@@ -1,7 +1,7 @@
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/global.pri
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/global.pri
 ===================================================================
---- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/corelib/global/global.pri
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/global.pri
+--- qt-everywhere-opensource-src-5.7.0-qtrac-1.0.orig/qtbase/src/corelib/global/global.pri
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/global.pri
 @@ -18,7 +18,9 @@ HEADERS +=  \
          global/qtypetraits.h \
          global/qflags.h \
@@ -24,10 +24,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/global.pri
  
  # qlibraryinfo.cpp includes qconfig.cpp
  INCLUDEPATH += $$QT_BUILD_TREE/src/corelib/global
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qik.cpp
 @@ -0,0 +1,173 @@
 +#include "qik.h"
 +#include <stdio.h>
@@ -202,10 +202,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.cpp
 +
 +
 +
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qik.h
 ===================================================================
 --- /dev/null
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qik.h
 @@ -0,0 +1,35 @@
 +#ifndef QTRAC_QIK
 +#define QTRAC_QIK
@@ -242,25 +242,25 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qik.h
 +}
 +
 +#endif
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/Qtrac
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/include/QtCore/Qtrac
 ===================================================================
 --- /dev/null
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/Qtrac
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/include/QtCore/Qtrac
 @@ -0,0 +1,2 @@
 +#include "qtrac.h"
 +
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/qtrac.h
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/include/QtCore/qtrac.h
 ===================================================================
 --- /dev/null
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/qtrac.h
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/include/QtCore/qtrac.h
 @@ -0,0 +1,3 @@
 +#include "../../src/corelib/global/qik.h"
 +#include "../../src/corelib/global/qtrac.h"
 +
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/tools/moc/generator.cpp
 ===================================================================
---- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/tools/moc/generator.cpp
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
+--- qt-everywhere-opensource-src-5.7.0-qtrac-1.0.orig/qtbase/src/tools/moc/generator.cpp
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/tools/moc/generator.cpp
 @@ -1158,8 +1158,11 @@ void Generator::generateStaticMetacall()
              const FunctionDef &f = methodList.at(methodindex);
              Q_ASSERT(!f.normalizedType.isEmpty());
@@ -288,10 +288,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/generator.cpp
          }
          fprintf(out, "        default: ;\n");
          fprintf(out, "        }\n");
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/tools/moc/moc.cpp
 ===================================================================
---- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/tools/moc/moc.cpp
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
+--- qt-everywhere-opensource-src-5.7.0-qtrac-1.0.orig/qtbase/src/tools/moc/moc.cpp
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/tools/moc/moc.cpp
 @@ -34,12 +34,27 @@
  #include <QtCore/qfile.h>
  #include <QtCore/qfileinfo.h>
@@ -348,10 +348,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.cpp
  
      fprintf(out, "#if !defined(Q_MOC_OUTPUT_REVISION)\n"
              "#error \"The header file '%s' doesn't include <QObject>.\"\n", fn.constData());
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.h
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/tools/moc/moc.h
 ===================================================================
---- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/tools/moc/moc.h
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.h
+--- qt-everywhere-opensource-src-5.7.0-qtrac-1.0.orig/qtbase/src/tools/moc/moc.h
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/tools/moc/moc.h
 @@ -38,6 +38,7 @@
  #include <qjsonobject.h>
  #include <stdio.h>
@@ -387,10 +387,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/moc/moc.h
  };
  Q_DECLARE_TYPEINFO(FunctionDef, Q_MOVABLE_TYPE);
  
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/bootstrap/bootstrap.pro
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/tools/bootstrap/bootstrap.pro
 ===================================================================
---- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/tools/bootstrap/bootstrap.pro
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/bootstrap/bootstrap.pro
+--- qt-everywhere-opensource-src-5.7.0-qtrac-1.0.orig/qtbase/src/tools/bootstrap/bootstrap.pro
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/tools/bootstrap/bootstrap.pro
 @@ -36,6 +36,7 @@ SOURCES += \
             ../../corelib/global/qlogging.cpp \
             ../../corelib/global/qmalloc.cpp \
@@ -399,17 +399,17 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/tools/bootstrap/bootstrap.p
             ../../corelib/io/qabstractfileengine.cpp \
             ../../corelib/io/qbuffer.cpp \
             ../../corelib/io/qdatastream.cpp \
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/qtrac_bootstrap.h
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/include/QtCore/qtrac_bootstrap.h
 ===================================================================
 --- /dev/null
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/include/QtCore/qtrac_bootstrap.h
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/include/QtCore/qtrac_bootstrap.h
 @@ -0,0 +1,2 @@
 +#include "../../src/corelib/global/qtrac.h"
 +
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.cpp
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qtrac.cpp
 ===================================================================
 --- /dev/null
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.cpp
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qtrac.cpp
 @@ -0,0 +1,32 @@
 +#include "qtrac.h"
 +
@@ -443,10 +443,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.cpp
 +fprintf(out, ".                                                                                .\n");
 +}
 +
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.h
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qtrac.h
 ===================================================================
 --- /dev/null
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.h
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qtrac.h
 @@ -0,0 +1,17 @@
 +#ifndef QTRAC_QTRAC
 +#define QTRAC_QTRAC
@@ -465,10 +465,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/global/qtrac.h
 +#endif
 +
 +
-Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/kernel/qobject.h
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/kernel/qobject.h
 ===================================================================
---- qt-everywhere-opensource-src-5.7.0.orig/qtbase/src/corelib/kernel/qobject.h
-+++ qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/kernel/qobject.h
+--- qt-everywhere-opensource-src-5.7.0-qtrac-1.0.orig/qtbase/src/corelib/kernel/qobject.h
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/kernel/qobject.h
 @@ -422,8 +422,9 @@ public:
  public Q_SLOTS:
      void deleteLater();
@@ -480,10 +480,10 @@ Index: qt-everywhere-opensource-src-5.7.0/qtbase/src/corelib/kernel/qobject.h
      int senderSignalIndex() const;
      int receivers(const char* signal) const;
      bool isSignalConnected(const QMetaMethod &signal) const;
-Index: qt-everywhere-opensource-src-5.7.0/README
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/README
 ===================================================================
---- qt-everywhere-opensource-src-5.7.0.orig/README
-+++ qt-everywhere-opensource-src-5.7.0/README
+--- qt-everywhere-opensource-src-5.7.0-qtrac-1.0.orig/README
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/README
 @@ -1,3 +1,11 @@
 +WARNING
 +=======
@@ -496,3 +496,16 @@ Index: qt-everywhere-opensource-src-5.7.0/README
  HOW TO BUILD QT5
  ================
  
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/configure
+===================================================================
+--- qt-everywhere-opensource-src-5.7.0-qtrac-1.0.orig/qtbase/configure
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/configure
+@@ -3589,7 +3589,7 @@ if [ -z "$QT_INSTALL_PREFIX" ]; then
+     if [ "$CFG_DEV" = "yes" ]; then
+         QT_INSTALL_PREFIX="$outpath" # In Development, we use sandboxed builds by default
+     else
+-        QT_INSTALL_PREFIX="/usr/local/Qt-${QT_VERSION}" # the default install prefix is /usr/local/Qt-$QT_VERSION
++        QT_INSTALL_PREFIX="/usr/local/Qt-${QT_VERSION}-qtrac-1.0" # the default install prefix is /usr/local/Qt-$QT_VERSION
+     fi
+ fi
+ QT_INSTALL_PREFIX=`makeabs "$QT_INSTALL_PREFIX"`
