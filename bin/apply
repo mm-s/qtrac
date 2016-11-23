@@ -1,0 +1,89 @@
+#!/bin/bash
+
+if [ $1 -eq "" ]; then
+	echo "please specify the directory where qt-everywhere has been unpacked"
+	exit 1
+fi
+
+BIN="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo $BIN
+
+cd $1
+
+pwd=`pwd`
+
+
+echo '     Qtrac is about to patch your Qt source package at:'
+echo "     $pwd"
+echo ''
+
+licence=`echo $pwd | sed 's/.*qt-everywhere-\([a-z]*\)-src-.*/\1/'`
+version=`echo $pwd | sed 's/.*qt-everywhere-[a-z]*-src-\(.*\)/\1/'`
+echo 'Your qt package details:'
+echo "   licence:   $licence"
+echo "   version:   $version"
+echo ""
+version="${version}"
+
+if [ ! -d $BIN/../qik/qt-$version ]; then
+	echo "ERROR: Qt version $version is not currently supported by Qtrac"
+	echo ""
+	echo "Sorry about that, Currently supported versions are:"
+	find $BIN/../qik -type d -name "qt-*" | sed "s/.*qt-\(.*\)/      \1/"
+	echo ""
+	echo "more information at https://github.com/mm-s/qtrac/wiki"
+	exit 1
+fi
+
+if [ -d patches ]; then
+	echo "Error: this copy of Qt has been already patched."
+	exit 1
+fi
+cp $BIN/../qik/qt-$version/patches . -R
+if [ "x$licence" == "xenterprise" ]; then
+	cat $BIN/../qik/qt-$version/patches/qik | sed "s/qt-everywhere-opensource-src/qt-everywhere-enterprise-src/" > patches/qik
+fi
+quilt push
+
+cd ..
+mv $1 $1-qtrac-1.0
+
+
+echo '.                                                                                .'
+echo '.                                      >WWw,                                     .'
+echo '.                                       `)WWW                                    .'
+echo '.                                         )8WWu                ,uwu,             .'
+echo '.                                          88WWWu            yWWWWWWWW,          .'
+echo '.                                           `8WWWWwu,       8#WWWWWWWW`          .'
+echo '.                                             `8WWWWWWWWwwwWWWWWWWWW*`           .'
+echo '.                                               `8WWWWWWWWWWWWWWWW*`             .'
+echo '.                                                ##WWWWWWWWWWWW*`                .'
+echo '.   ,,,ywu                                     y#WWWWWWWWWWWWWWWWWWWWWWWwwuuywwW>.'
+echo '.WWWWWWWWWWWWWWWWWWwu,                       ,&#WWWWWWWWWWWWWWWWW==WWWWW=====**^ .'
+echo '. `^***====WWWWWWWWWWWWWWwwu,,,,uwWWWWWWw,,uWWWWWWWWWWWWWWWWW`                   .'
+echo '.            `*===WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW                     .'
+echo '.                 `=WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                      .'
+echo '.                    `*==WWWWWWWWWWWWWWWWWWWWWWWWWWWW*`                          .'
+echo '.                        `*==WWWWWWWWWWWWWWWWWWWW=*`                             .'
+echo '.                             ^*===WWWWWWWWWW=*`                                 .'
+echo '.                    .d88888b.  888                                              .'
+echo '.                   d88P` `Y88b 888                                              .'
+echo '.                   888     888 888                                              .'
+echo '.                   888     888 888888 888d888 8888b.   .d8888b                  .'
+echo '.                   888     888 888    888P`      `88b d88P`                     .'
+echo '.                   888 Y8b 888 888    888    .d888888 888                       .'
+echo '.                   Y88b.Y8b88P Y88b.  888    888  888 Y88b.                     .'
+echo '.                    `Y888888`   `Y888 888    `Y888888  `Y8888P                  .'
+echo '.                          Y8b                                                   .'
+echo '.                                                                                .'
+
+
+echo "Congratulations!"
+echo "Your instrumented copy of Qt is ready to be compiled at "
+echo "$1-qtrac-1.0"
+echo "See $1-qtrac-1.0/README"
+echo ""
+echo "Thanks for using Qtrac, always more at https://github.com/mm-s/qtrac/wiki"
+echo "Consider upgrading to Qtrac-Pro, learn more at http://qtrac.org"
+echo ""
+
