@@ -2,7 +2,7 @@
 
 tgz=$1
 
-if [ $tgz -eq "" ]; then
+if [ "x$tgz" == "x" ]; then
 	echo "please specify the qt-everywhere tarball file (qt-everywhere-*-src-*.tar.gz)"
 	exit 1
 fi
@@ -15,7 +15,7 @@ if [ ! -f $1 ]; then
 	exit 1
 fi
 
-qtdir=`echo $tgz | sed "s/\(.*\).tar.gz/\1/"
+qtdir=`echo $tgz | sed "s/\(.*\).tar.gz/\1/"`
 
 if [ -d $qtdir ]; then
 	echo "A directory named $qtdir already exists. Aborting."
@@ -28,7 +28,16 @@ if [ -d $finalqtdir ]; then
 	exit 1
 fi
 
+quiltv=`quilt --version`
+if [ ! $? -eq 0 ]; then
+	echo "quilt must be installed in your system in order to proceed. Aborting"
+	echo "see https://en.wikipedia.org/wiki/Quilt_%28software%29"
+	exit 1
+fi
 
+echo "using quilt version $quiltv"
+
+echo "uncompressing $tgz..."
 tar -xzf $tgz
 if [ ! $? -eq 0 ]; then
 	echo "I found errors uncompressing the supplied file. Aborting."
@@ -40,21 +49,9 @@ if [ ! -d $qtdir ]; then
 	exit 1
 fi
 
-quiltv=`quilt --version`
-if [ ! $? -eq 0 ]; then
-	echo "quilt must be installed in your system in order to proceed. Aborting"
-	echo "see https://en.wikipedia.org/wiki/Quilt_%28software%29"
-	exit 1
-fi
-
-echo "using quilt version $quiltv"
-
 cd $qtdir
 
 pwd=`pwd`
-
-echo "     Qtrac is about to patch your Qt source package at $pwd"
-echo ""
 
 licence=`echo $pwd | sed 's/.*qt-everywhere-\([a-z]*\)-src-.*/\1/'`
 version=`echo $pwd | sed 's/.*qt-everywhere-[a-z]*-src-\(.*\)/\1/'`
@@ -78,14 +75,22 @@ if [ -d patches ]; then
 	echo "Error: this copy of Qt has been already patched (it contains patches directory)."
 	exit 1
 fi
+
+echo "patching package"
+
 cp $BIN/../qik/qt-$version/patches . -R
 if [ "x$licence" == "xenterprise" ]; then
 	cat $BIN/../qik/qt-$version/patches/qik | sed "s/qt-everywhere-opensource-src/qt-everywhere-enterprise-src/" > patches/qik
 fi
 quilt push
+if [ ! $? -eq 0 ]; then
+	echo "Error: could not patch sources successfully. Aborting"
+	exit 1
+fi
+
 
 cd ..
-mv $1 $1-qtrac-1.0
+mv $qtdir $finalqtdir
 
 
 echo '.                                                                                .'
@@ -93,9 +98,9 @@ echo '.                                      >WWw,                              
 echo '.                                       `)WWW                                    .'
 echo '.                                         )8WWu                ,uwu,             .'
 echo '.                                          88WWWu            yWWWWWWWW,          .'
-echo '.                                           `8WWWWwu,       8#WWWWWWWW`          .'
-echo '.                                             `8WWWWWWWWwwwWWWWWWWWW*`           .'
-echo '.                                               `8WWWWWWWWWWWWWWWW*`             .'
+echo '.                                           ~8WWWWwu,       8#WWWWWWWW`          .'
+echo '.                                             ~8WWWWWWWWwwwWWWWWWWWW*`           .'
+echo '.                                               ~8WWWWWWWWWWWWWWWW*`             .'
 echo '.                                                ##WWWWWWWWWWWW*`                .'
 echo '.   ,,,ywu                                     y#WWWWWWWWWWWWWWWWWWWWWWWwwuuywwW>.'
 echo '.WWWWWWWWWWWWWWWWWWwu,                       ,&#WWWWWWWWWWWWWWWWW==WWWWW=====**^ .'
