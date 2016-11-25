@@ -1,8 +1,10 @@
-yum install gcc-c++
-yum install make
-wget http://download.qt.io/official_releases/qt/5.7/5.7.0/single/qt-everywhere-opensource-src-5.7.0.tar.gz
+#!/bin/bash
+
+yum install gcc-c++ -q -y
+yum install make -q -y
+wget -q http://download.qt.io/official_releases/qt/5.7/5.7.0/single/qt-everywhere-opensource-src-5.7.0.tar.gz
 tar -xzf qt-everywhere-opensource-src-5.7.0.tar.gz 
 cd qt-everywhere-opensource-src-5.7.0
-./configure -debug -silent
+./configure -debug -silent -developer-build -opensource -confirm-license
 time make
 

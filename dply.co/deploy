@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ip=$1
+script=$2
+
+scp $script root@$ip:~
+ssh root@$ip ./$script
+
+
+
