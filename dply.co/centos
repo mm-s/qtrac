@@ -15,7 +15,7 @@ wget http://dl.fedoraproject.org/pub/epel/7/x86_64/q/quilt-0.63-2.el7.noarch.rpm
 yum install bzip2 diffstat procmail rpm-build -q -y
 rpm -Uvh quilt-0.63-2.el7.noarch.rpm 
 yum install quilt -q -y
-yum install libX11-devel libXext-devel libXtst-devel -q -y
+yum install libX11-devel libXext-devel libXtst-devel libXrender -q -y
 
 dd if=/dev/zero of=/swapfile bs=1024 count=1000000
 mkswap /swapfile
