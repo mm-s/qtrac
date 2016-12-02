@@ -4,7 +4,7 @@ tgz=$1
 
 yum install gcc-c++ -q -y
 yum install make -q -y
-yum install git -q -y
+yum install subversion -q -y
 yum install quilt -q -y
 if [ -f $1 ]; then
 	wget -q http://download.qt.io/official_releases/qt/5.7/5.7.0/single/$tgz
