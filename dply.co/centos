@@ -21,7 +21,8 @@ dd if=/dev/zero of=/swapfile bs=1024 count=1000000
 mkswap /swapfile
 swapon /swapfile
 
-dir=`qtrac/bin/apply $1`
+dir=`qtrac/bin/apply $1 | tail -n1`
+echo "entering $dir"
 cd $dir
 
 ./configure -debug -silent -developer-build -opensource -confirm-license
