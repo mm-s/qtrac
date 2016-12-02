@@ -6,7 +6,8 @@ yum install gcc-c++ -q -y
 yum install make -q -y
 yum install subversion -q -y
 yum install quilt -q -y
-if [ -f $1 ]; then
+if [ ! -f $tgz ]; then
+        echo "fetching $tgz"
 	wget -q http://download.qt.io/official_releases/qt/5.7/5.7.0/single/$tgz
 fi
 
@@ -21,7 +22,9 @@ dd if=/dev/zero of=/swapfile bs=1024 count=1000000
 mkswap /swapfile
 swapon /swapfile
 
-dir=`qtrac/bin/apply $1 | tail -n1`
+echo "executing qtrac/bin/apply $tgz | tail -n1"
+
+dir=`qtrac/bin/apply $tgz | tail -n1`
 echo "entering $dir"
 cd $dir
 
