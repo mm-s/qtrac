@@ -18,6 +18,13 @@ rpm -Uvh quilt-0.63-2.el7.noarch.rpm
 yum install quilt -q -y
 yum install libX11-devel libXext-devel libXtst-devel libXrender -q -y
 
+
+cd /usr/lib64
+ln -s libXrender.so.1 libXrender.so
+cd
+
+
+
 dd if=/dev/zero of=/swapfile bs=1024 count=1000000
 mkswap /swapfile
 swapon /swapfile
@@ -27,6 +34,7 @@ echo "executing qtrac/bin/apply $tgz | tail -n1"
 dir=`qtrac/bin/apply $tgz | tail -n1`
 echo "entering $dir"
 cd $dir
+
 
 ./configure -debug -silent -developer-build -opensource -confirm-license
 time make
