@@ -1,6 +1,9 @@
 #!/bin/bash
 
 input=$1
+shift
+
+opt=$1
 
 if [ "x$input" == "x" ]; then
 	echo "please specify the qt-everywhere tarball file (qt-everywhere-*-src-*.tar.gz)"
@@ -11,8 +14,8 @@ fi
 BIN="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #echo $BIN
 
-if [ ! -f $1 ]; then
-	if [ -d $1 ]; then
+if [ ! -f $input ]; then
+	if [ -d $input ]; then
 		qtdir=$input
 		tgz=""
 	else
@@ -87,9 +90,17 @@ fi
 
 echo "patching package"
 
-cp $BIN/../qik/qt-$version/patches . -R
-if [ "x$licence" == "xenterprise" ]; then
-	cat $BIN/../qik/qt-$version/patches/qik | sed "s/qt-everywhere-opensource-src/qt-everywhere-enterprise-src/" > patches/qik
+if [ "x$opt" == "x--edit" ]; then
+	if [ "x$licence" != "xopensource" ]; then
+		echo "Error, only opensource version is editable"
+		exit 1
+	fi
+	ln -s $BIN/../qik/qt-$version/patches
+else
+	cp $BIN/../qik/qt-$version/patches . -R
+	if [ "x$licence" == "xenterprise" ]; then
+		cat $BIN/../qik/qt-$version/patches/qik | sed "s/qt-everywhere-opensource-src/qt-everywhere-enterprise-src/" > patches/qik
+	fi
 fi
 quilt push
 if [ ! $? -eq 0 ]; then

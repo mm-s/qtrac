@@ -28,7 +28,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,173 @@
+@@ -0,0 +1,181 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -45,10 +45,10 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +
 +c _qik_instance;
 +
-+c::qik():debug(0) {
++c::qik():log(0), port( {
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
-+	if (env.contains(QString::fromLatin1("QTRAC_DEBUG"))) {
-+		debug=new QFile(QString::fromLatin1("qtrac.log"));
++	if (env.contains(QString::fromLatin1("QTRAC_LOG"))) {
++		log=new QFile(env.value(QString::fromLatin1("QTRAC_LOG")));
 +	}
 +	if (!env.contains(QString::fromLatin1("QTRAC_NOBANNER"))) {
 +		qtrac::banner(stdout);
@@ -56,16 +56,16 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +
 +	QSettings settings(QString::fromLatin1("Qtrac"), QString::fromLatin1("qik"));
 +	{
-+		if (env.contains(QString::fromLatin1("QTRAC_OUTPUT_FILENAME"))) {
-+			output_filename=env.value(QString::fromLatin1("QTRAC_OUTPUT_FILENAME"));
++		if (env.contains(QString::fromLatin1("QTRAC_OUTPUT_FILE"))) {
++			output_filename=env.value(QString::fromLatin1("QTRAC_OUTPUT_FILE"));
 +		}
 +		else {
 +			if (!settings.contains(QString::fromLatin1("output/filename")))
-+				settings.setValue(QString::fromLatin1("output/filename"), QString::fromLatin1("qtrac.out")); //file
++				settings.setValue(QString::fromLatin1("output/filename"), QString::fromLatin1("")); //file
 +
 +			output_filename=settings.value(QString::fromLatin1("output/filename")).toString();
 +		}
-+		if (debug) cout << "output_filename=" << output_filename.toStdString() << endl;
++		if (log) cout << "output_filename=" << output_filename.toStdString() << endl;
 +	}
 +
 +	QString output_socket;
@@ -75,21 +75,29 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +		}
 +		else {
 +			if (!settings.contains(QString::fromLatin1("output/socket")))
-+				settings.setValue(QString::fromLatin1("output/socket"), QString::fromLatin1(""));
++				settings.setValue(QString::fromLatin1("output/socket"), QString::fromLatin1("localhost:4242"));
 +			output_socket=settings.value(QString::fromLatin1("output/socket")).toString();
 +		}
-+		if (debug) cout << "output_socket=" << output_socket.toStdString() << endl;
++		if (log) cout << "output_socket=" << output_socket.toStdString() << endl;
 +	}
-+
-+
-+	if (debug) {
++	QStringList a=output_socket.split(QString::fromLatin1(":"));
++	if (a.size()>0) {
++		host=a[0];
++		if (a.size()>1) {
++			bool ok=true;
++			int p=a[1].toInt(&ok);
++			if (ok) port=p;
++		}
++	}
++/*
++	if (log) {
 +		QHash<QString, QVariant> hash;
 +		const QStringList keys = settings.allKeys();
 +		for(const QString& key: keys) {
 +		  hash[key] = settings.value(key);
 +		}
 +	}
-+
++*/
 +	connect_socket();
 +
 +/*
@@ -108,7 +116,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +}
 +
 +c::~qik() {
-+	delete debug;
++	delete log;
 +}
 +
 +qik& c::instance() {
@@ -158,7 +166,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +}
 +
 +void c::error(string ) {
-+	if (!debug) return;
++	if (!log) return;
 +
 +}
 +
