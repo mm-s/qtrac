@@ -150,3 +150,5 @@ echo "Thanks for choosing Qtrac, always more at https://github.com/mm-s/qtrac/wi
 echo "Consider upgrading to Qtrac-Pro, learn more at http://qtrac.org"
 echo ""
 
+echo $finalqtdir
+

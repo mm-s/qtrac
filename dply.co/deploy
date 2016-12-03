@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [ "x$1" == "x" ]; then
+	echo "deploy <ip> <os> [<upload_tgz>]"
+	exit 1
+fi
+ip=$1
+shift
+
+if [ "x$1" == "x" ]; then
+	echo "deploy <ip> <os> [<upload_tgz>]"
+	exit 1
+fi
+script=$1
+shift
+
+tgz=$1
+
+if [ "x$tgz" != "x" ]; then
+	scp $tgz root@$ip:~
+fi
+
+
+scp $script root@$ip:~
+ssh root@$ip ./$script $(basename $tgz)
+
+
+
