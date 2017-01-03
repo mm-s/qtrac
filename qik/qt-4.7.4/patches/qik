@@ -27,7 +27,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +
 +c _qik_instance;
 +
-+c::qik():debug(0) {
++c::qik(): debug(0), port(0) {
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
 +	if (env.contains(QString::fromLatin1("QTRAC_DEBUG"))) {
 +		debug=new QFile(QString::fromLatin1("qtrac.log"));
