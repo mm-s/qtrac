@@ -6,8 +6,8 @@ shift
 opt=$1
 
 if [ "x$input" == "x" ]; then
-	echo "please specify the qt-everywhere tarball file (qt-everywhere-*-src-*.tar.gz)"
-	echo "if you have a file with another extension you can uncompress it manually and specify the resulting directory intead of a tar.gz file."
+	echo "Please specify the qt-everywhere tarball file (qt-everywhere-*-src-*.tar.gz)"
+	echo "If you have a file with another extension (e.g. zip) you can uncompress it manually and then specify the resulting directory name."
 	exit 1
 fi
 
