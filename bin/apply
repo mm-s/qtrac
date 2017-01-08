@@ -79,7 +79,8 @@ if [ ! -d $BIN/../qik/qt-$version ]; then
 	echo "Sorry about that, Currently supported versions are:"
 	find $BIN/../qik -type d -name "qt-*" | sed "s/.*qt-\(.*\)/      \1/"
 	echo ""
-	echo "more information at https://github.com/mm-s/qtrac/wiki"
+	echo "More information at https://github.com/mm-s/qtrac/wiki"
+	echo "Contact support@qtrac.org for making a request to support a specific version of qt."
 	exit 1
 fi
 
