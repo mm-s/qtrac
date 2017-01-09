@@ -28,7 +28,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,193 @@
+@@ -0,0 +1,188 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -46,19 +46,16 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +
 +c _qik_instance;
 +
-+c::qik(): debug(0), port(0) {
++c::qik(): port(0) {
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
 +	if (env.contains(QString::fromLatin1("QTRAC_LOG"))) {
-+		debug=new QFile(env.value(QString::fromLatin1("QTRAC_LOG")));
-+		if (!debug->open(QIODevice::ReadOnly | QIODevice::Text)) {
-+			delete debug;
-+			debug=0;
++		dbg.open(env.value(QString::fromLatin1("QTRAC_LOG")).toStdString().c_str(),ios::app);
++		if (!debug->good()) {
 +			cerr << "Could not open file " << env.value(QString::fromLatin1("QTRAC_LOG")).toStdString() << endl;
 +		}
 +	}
-+	QTextStream dbg(debug);
 +	dbg << "Env" << endl;
-+	dbg << env.toStringList().join(QString::fromLatin1("\n")) << QString::fromLatin1("\n");
++	dbg << env.toStringList().join(QString::fromLatin1("\n")) << endl;
 +	if (!env.contains(QString::fromLatin1("QTRAC_NOBANNER"))) {
 +		qtrac::banner(stdout);
 +	}
@@ -76,7 +73,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +
 +			output_filename=settings.value(QString::fromLatin1("output/filename")).toString();
 +		}
-+		dbg << "output_filename=" << output_filename << QString::fromLatin1("\n");
++		dbg << "output_filename=" << output_filename.toStdString() << endl;
 +	}
 +
 +	QString output_socket;
@@ -89,7 +86,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +				settings.setValue(QString::fromLatin1("output/socket"), QString::fromLatin1("localhost:4242"));
 +			output_socket=settings.value(QString::fromLatin1("output/socket")).toString();
 +		}
-+		dbg << "output_socket=" << output_socket << endl;
++		dbg << "output_socket=" << output_socket.toStdString() << endl;
 +	}
 +	QStringList a=output_socket.split(QString::fromLatin1(":"));
 +	if (a.size()>0) {
@@ -127,7 +124,6 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +}
 +
 +c::~qik() {
-+	delete debug;
 +}
 +
 +qik& c::instance() {
@@ -177,8 +173,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +}
 +
 +void c::error(string errmsg) {
-+       QTextStream dbg(debug);
-+       dbg << QString::fromLatin1(errmsg.c_str()) << QString::fromLatin1("\n");
++       dbg << errmsg << endl;
 +
 +}
 +
@@ -232,7 +227,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +
 +#include <string>
 +#include <QtCore/qglobal.h>
-+#include <QFile>
++#include <fstream>
 +
 +namespace qtrac {
 +using namespace std;
@@ -251,7 +246,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +	void disconnect();
 +	void error(string err);
 +
-+	QFile* debug;
++	fstream debug;
 +	QString output_filename;
 +	int port;
 +	QString host;
