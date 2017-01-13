@@ -33,7 +33,7 @@ Index: qt-everywhere-opensource-src-4.7.4/src/corelib/global/qik.cpp
 +		debug=new QFile(QString::fromLatin1("qtrac.log"));
 +	}
 +	if (!env.contains(QString::fromLatin1("QTRAC_NOBANNER"))) {
-+		qtrac::banner(stdout);
++		qtrac::banner(stderr);
 +	}
 +
 +	QSettings settings(QString::fromLatin1("Qtrac"), QString::fromLatin1("qik"));
