@@ -2,7 +2,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
-@@ -0,0 +1,173 @@
+@@ -0,0 +1,153 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -29,25 +29,32 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +
 +c::qik(): debug(0), port(0) {
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
-+	if (env.contains(QString::fromLatin1("QTRAC_DEBUG"))) {
-+		debug=new QFile(QString::fromLatin1("qtrac.log"));
++	if (env.contains(QString::fromLatin1("QTRAC_LOG"))) {
++		dbg.open(env.value(QString::fromLatin1("QTRAC_LOG")).toStdString().c_str(),ios::app);
++		if (!dbg->good()) {
++			cerr << "Could not open file " << env.value(QString::fromLatin1("QTRAC_LOG")).toStdString() << endl;
++		}
 +	}
++	dbg << "Env" << endl;
++	dbg << env.toStringList().join(QString::fromLatin1("\n")) << endl;
 +	if (!env.contains(QString::fromLatin1("QTRAC_NOBANNER"))) {
-+		qtrac::banner(stderr);
++		qtrac::banner(stdlog);
 +	}
 +
 +	QSettings settings(QString::fromLatin1("Qtrac"), QString::fromLatin1("qik"));
++	//dbg << "Settings" << endl;
++	//dbg << settings.toStringList().join(QString::fromLatin1("\n"));
 +	{
-+		if (env.contains(QString::fromLatin1("QTRAC_OUTPUT_FILENAME"))) {
-+			output_filename=env.value(QString::fromLatin1("QTRAC_OUTPUT_FILENAME"));
++		if (env.contains(QString::fromLatin1("QTRAC_OUTPUT_FILE"))) {
++			output_filename=env.value(QString::fromLatin1("QTRAC_OUTPUT_FILE"));
 +		}
 +		else {
 +			if (!settings.contains(QString::fromLatin1("output/filename")))
-+				settings.setValue(QString::fromLatin1("output/filename"), QString::fromLatin1("qtrac.out")); //file
++				settings.setValue(QString::fromLatin1("output/filename"), QString::fromLatin1("")); //file
 +
 +			output_filename=settings.value(QString::fromLatin1("output/filename")).toString();
 +		}
-+		if (debug) cout << "output_filename=" << output_filename.toStdString() << endl;
++		dbg << "output_filename=" << output_filename.toStdString() << endl;
 +	}
 +
 +	QString output_socket;
@@ -57,40 +64,24 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +		}
 +		else {
 +			if (!settings.contains(QString::fromLatin1("output/socket")))
-+				settings.setValue(QString::fromLatin1("output/socket"), QString::fromLatin1(""));
++				settings.setValue(QString::fromLatin1("output/socket"), QString::fromLatin1("localhost:4242"));
 +			output_socket=settings.value(QString::fromLatin1("output/socket")).toString();
 +		}
-+		if (debug) cout << "output_socket=" << output_socket.toStdString() << endl;
++		dbg << "output_socket=" << output_socket.toStdString() << endl;
 +	}
-+
-+
-+	if (debug) {
-+		QHash<QString, QVariant> hash;
-+		const QStringList keys = settings.allKeys();
-+		Q_FOREACH(QString key, keys) {
-+		  hash[key] = settings.value(key);
++	QStringList a=output_socket.split(QString::fromLatin1(":"));
++	if (a.size()>0) {
++		host=a[0];
++		if (a.size()>1) {
++			bool ok=true;
++			int p=a[1].toInt(&ok);
++			if (ok) port=p;
 +		}
 +	}
-+
 +	connect_socket();
-+
-+/*
-+	if (!output_socket.empty()) {
-+   QByteArray data; // <-- fill with data
-+
-+    _pSocket = new QTcpSocket( this );
-+    connect( _pSocket, SIGNAL(readyRead()), SLOT(readTcpData()) );
-+
-+    _pSocket->connectToHost("127.0.0.1", 9000);
-+    if( _pSocket->waitForConnected() ) {
-+        _pSocket->write( data );
-+    }
-+	}
-+*/
 +}
 +
 +c::~qik() {
-+	delete debug;
 +}
 +
 +qik& c::instance() {
@@ -116,24 +107,13 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +		tot-=n;
 +		p+=n;
 +	}
-+/*
-+    bzero(buffer,256);
-+    n = read(sockfd,buffer,255);
-+    if (n < 0)
-+         error("ERROR reading from socket");
-+    printf("%s\n",buffer);
-+    return 0;
-+*/
-+
 +}
 +
 +void c::read_conf() {
-+
 +}
 +
 +void c::error(string ) {
-+	if (!debug) return;
-+
++	dbg << errmsg << endl;
 +}
 +
 +void c::connect_socket() {
@@ -186,7 +166,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.h
 +
 +#include <string>
 +#include <QtCore/qglobal.h>
-+#include <QFile>
++#include <fstream>
 +
 +namespace qtrac {
 +using namespace std;
@@ -205,7 +185,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.h
 +	void disconnect();
 +	void error(string err);
 +
-+	QFile* debug;
++	fstream dbg;
 +	QString output_filename;
 +	int port;
 +	QString host;

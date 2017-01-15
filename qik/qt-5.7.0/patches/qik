@@ -28,7 +28,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qik.cpp
-@@ -0,0 +1,188 @@
+@@ -0,0 +1,156 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -50,14 +50,14 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
 +	if (env.contains(QString::fromLatin1("QTRAC_LOG"))) {
 +		dbg.open(env.value(QString::fromLatin1("QTRAC_LOG")).toStdString().c_str(),ios::app);
-+		if (!debug->good()) {
++		if (!dbg->good()) {
 +			cerr << "Could not open file " << env.value(QString::fromLatin1("QTRAC_LOG")).toStdString() << endl;
 +		}
 +	}
 +	dbg << "Env" << endl;
 +	dbg << env.toStringList().join(QString::fromLatin1("\n")) << endl;
 +	if (!env.contains(QString::fromLatin1("QTRAC_NOBANNER"))) {
-+		qtrac::banner(stdout);
++		qtrac::banner(stdlog);
 +	}
 +
 +	QSettings settings(QString::fromLatin1("Qtrac"), QString::fromLatin1("qik"));
@@ -97,30 +97,8 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +			if (ok) port=p;
 +		}
 +	}
-+/*
-+	if (log) {
-+		QHash<QString, QVariant> hash;
-+		const QStringList keys = settings.allKeys();
-+		for(const QString& key: keys) {
-+		  hash[key] = settings.value(key);
-+		}
-+	}
-+*/
 +	connect_socket();
 +
-+/*
-+	if (!output_socket.empty()) {
-+   QByteArray data; // <-- fill with data
-+
-+    _pSocket = new QTcpSocket( this );
-+    connect( _pSocket, SIGNAL(readyRead()), SLOT(readTcpData()) );
-+
-+    _pSocket->connectToHost("127.0.0.1", 9000);
-+    if( _pSocket->waitForConnected() ) {
-+        _pSocket->write( data );
-+    }
-+	}
-+*/
 +}
 +
 +c::~qik() {
@@ -147,7 +125,7 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +	if (sockfd==0) return;
 +	string sbuff=os.str();
 +	const char* p=sbuff.c_str();
-+        int tot=sbuff.size();
++    int tot=sbuff.size();
 +	while(tot>0) {
 +		int n=write(sockfd,p,tot);
 +		if (n < 0)  {
@@ -157,24 +135,14 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +		tot-=n;
 +		p+=n;
 +	}
-+/*
-+    bzero(buffer,256);
-+    n = read(sockfd,buffer,255);
-+    if (n < 0)
-+         error("ERROR reading from socket");
-+    printf("%s\n",buffer);
-+    return 0;
-+*/
-+
 +}
 +
 +void c::read_conf() {
 +
 +}
 +
-+void c::error(string errmsg) {
++void c::error(const string& errmsg) {
 +       dbg << errmsg << endl;
-+
 +}
 +
 +void c::connect_socket() {
@@ -244,9 +212,9 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qi
 +	void read_conf();
 +	void connect_socket();
 +	void disconnect();
-+	void error(string err);
++	void error(const string& err);
 +
-+	fstream debug;
++	fstream dbg;
 +	QString output_filename;
 +	int port;
 +	QString host;
@@ -466,9 +434,9 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/src/corelib/global/qt
 +#ifndef QTRAC_QTRAC
 +#define QTRAC_QTRAC
 +
-+
-+#include <stdio.h>
 +#include <QtCore/qglobal.h>
++#include <stdio.h>
++#include "qik.h"
 +
 +namespace qtrac {
 +
@@ -524,3 +492,14 @@ Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/configure
      fi
  fi
  QT_INSTALL_PREFIX=`makeabs "$QT_INSTALL_PREFIX"`
+Index: qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/include/QtCore/headers.pri
+===================================================================
+--- qt-everywhere-opensource-src-5.7.0-qtrac-1.0.orig/qtbase/include/QtCore/headers.pri
++++ qt-everywhere-opensource-src-5.7.0-qtrac-1.0/qtbase/include/QtCore/headers.pri
+@@ -4,3 +4,6 @@ SYNCQT.PRIVATE_HEADER_FILES = animation/
+ SYNCQT.QPA_HEADER_FILES = 
+ SYNCQT.CLEAN_HEADER_FILES = animation/qabstractanimation.h animation/qanimationgroup.h animation/qparallelanimationgroup.h animation/qpauseanimation.h animation/qpropertyanimation.h animation/qsequentialanimationgroup.h animation/qvariantanimation.h codecs/qtextcodec.h global/qcompilerdetection.h global/qconfig-dist.h global/qconfig-large.h global/qconfig-medium.h global/qconfig-minimal.h global/qconfig-nacl.h global/qconfig-small.h global/qendian.h global/qflags.h global/qglobal.h global/qglobalstatic.h global/qisenum.h global/qlibraryinfo.h global/qlogging.h global/qnamespace.h global/qnumeric.h global/qprocessordetection.h global/qsysinfo.h global/qsystemdetection.h global/qtypeinfo.h global/qtypetraits.h global/qversiontagging.h global/qconfig.h global/qfeatures.h io/qbuffer.h io/qdatastream.h io/qdebug.h io/qdir.h io/qdiriterator.h io/qfile.h io/qfiledevice.h io/qfileinfo.h io/qfileselector.h io/qfilesystemwatcher.h io/qiodevice.h io/qlockfile.h io/qloggingcategory.h io/qprocess.h io/qresource.h io/qsavefile.h io/qsettings.h io/qstandardpaths.h io/qstorageinfo.h io/qtemporarydir.h io/qtemporaryfile.h io/qtextstream.h io/qurl.h io/qurlquery.h itemmodels/qabstractitemmodel.h itemmodels/qabstractproxymodel.h itemmodels/qidentityproxymodel.h itemmodels/qitemselectionmodel.h itemmodels/qsortfilterproxymodel.h itemmodels/qstringlistmodel.h json/qjsonarray.h json/qjsondocument.h json/qjsonobject.h json/qjsonvalue.h kernel/qabstracteventdispatcher.h kernel/qabstractnativeeventfilter.h kernel/qbasictimer.h kernel/qcoreapplication.h kernel/qcoreevent.h kernel/qeventloop.h kernel/qfunctions_nacl.h kernel/qfunctions_vxworks.h kernel/qfunctions_wince.h kernel/qfunctions_winrt.h kernel/qmath.h kernel/qmetaobject.h kernel/qmetatype.h kernel/qmimedata.h kernel/qobject.h kernel/qobjectcleanuphandler.h kernel/qobjectdefs.h kernel/qpointer.h kernel/qsharedmemory.h kernel/qsignalmapper.h kernel/qsocketnotifier.h kernel/qsystemsemaphore.h kernel/qtimer.h kernel/qtranslator.h kernel/qvariant.h kernel/qwineventnotifier.h mimetypes/qmimedatabase.h mimetypes/qmimetype.h plugin/qfactoryinterface.h plugin/qlibrary.h plugin/qplugin.h plugin/qpluginloader.h plugin/quuid.h statemachine/qabstractstate.h statemachine/qabstracttransition.h statemachine/qeventtransition.h statemachine/qfinalstate.h statemachine/qhistorystate.h statemachine/qsignaltransition.h statemachine/qstate.h statemachine/qstatemachine.h thread/qatomic.h thread/qbasicatomic.h thread/qexception.h thread/qfuture.h thread/qfutureinterface.h thread/qfuturesynchronizer.h thread/qfuturewatcher.h thread/qmutex.h thread/qreadwritelock.h thread/qresultstore.h thread/qrunnable.h thread/qsemaphore.h thread/qthread.h thread/qthreadpool.h thread/qthreadstorage.h thread/qwaitcondition.h tools/qalgorithms.h tools/qarraydata.h tools/qarraydataops.h tools/qarraydatapointer.h tools/qbitarray.h tools/qbytearray.h tools/qbytearraylist.h tools/qbytearraymatcher.h tools/qcache.h tools/qchar.h tools/qcollator.h tools/qcommandlineoption.h tools/qcommandlineparser.h tools/qcontainerfwd.h tools/qcontiguouscache.h tools/qcryptographichash.h tools/qdatetime.h tools/qeasingcurve.h tools/qelapsedtimer.h tools/qhash.h tools/qhashfunctions.h tools/qiterator.h tools/qline.h tools/qlinkedlist.h tools/qlist.h tools/qlocale.h tools/qmap.h tools/qmargins.h tools/qmessageauthenticationcode.h tools/qpair.h tools/qpoint.h tools/qqueue.h tools/qrect.h tools/qrefcount.h tools/qregexp.h tools/qregularexpression.h tools/qscopedpointer.h tools/qscopedvaluerollback.h tools/qset.h tools/qshareddata.h tools/qsharedpointer.h tools/qsize.h tools/qstack.h tools/qstring.h tools/qstringbuilder.h tools/qstringlist.h tools/qstringmatcher.h tools/qtextboundaryfinder.h tools/qtimeline.h tools/qtimezone.h tools/qvarlengtharray.h tools/qvector.h tools/qversionnumber.h xml/qxmlstream.h 
+ SYNCQT.INJECTIONS = ../../src/corelib/global/qconfig.h:qconfig.h:QtConfig ../../src/corelib/global/qfeatures.h:qfeatures.h 
++SYNCQT.HEADER_FILES += global/qtrac.h global/qik.h
++SYNCQT.HEADER_CLASSES += ../../include/QtCore/Qtrac
++SYNCQT.PRIVATE_HEADER_FILES += ../../include/QtCore/qtrac_bootstrap.h
