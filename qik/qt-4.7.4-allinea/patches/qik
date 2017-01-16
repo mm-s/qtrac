@@ -2,7 +2,7 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/qik.cpp
-@@ -0,0 +1,168 @@
+@@ -0,0 +1,177 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -81,11 +81,15 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 +	//connect_socket();
 +    ostringstream of;
 +    of << "qtrac_" << getpid();
-+	out.open(of.str().c_str());
++	out.open(of.str().c_str(), ios_base::out | ios::trunc);
 +	if (!out.good()) {
-+		cerr << "Could not open file " << of.str() << endl;
++		cerr << "I Couldn't open file " << of.str() << endl;
 +		dbg << "Could not open file " << of.str() << endl;
 +	}
++    else {
++		cerr << "writting to file " << of.str() << endl;
++		dbg << "writting to file " << of.str() << endl;
++    }
 +
 +}
 +
@@ -99,11 +103,16 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 +void c::log(string data, const void* sender, const void* receiver) { //data is "s QFileSystemWatcher::fileChanged(1) io/qfilesystemwatcher.h:71"
 +    
 +//todo sync threads
-+	Qt::HANDLE tid=QThread::currentThreadId();
++//	Qt::HANDLE tid=QThread::currentThreadId();
 +//	ostringstream os;
 +//	os << tid << " " << sender << " " << receiver << " " << data << endl;
 +//"<tid> <sender> <receiver> s QFileSystemWatcher::fileChanged(1) io/qfilesystemwatcher.h:71"
-+	out << tid << " " << sender << " " << receiver << " " << data << endl;
++    if (sender==0) {
++	    out << "  SLOT: " << receiver << " " << data << endl;
++    }
++    else {
++	    out << "SIGNAL: " << sender << " " << data << endl;
++    }
 +    return;
 +
 +/*
