@@ -31,14 +31,14 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
 +	if (env.contains(QString::fromLatin1("QTRAC_LOG"))) {
 +		dbg.open(env.value(QString::fromLatin1("QTRAC_LOG")).toStdString().c_str(),ios::app);
-+		if (!dbg->good()) {
++		if (!dbg.good()) {
 +			cerr << "Could not open file " << env.value(QString::fromLatin1("QTRAC_LOG")).toStdString() << endl;
 +		}
 +	}
 +	dbg << "Env" << endl;
-+	dbg << env.toStringList().join(QString::fromLatin1("\n")) << endl;
++	dbg << env.toStringList().join(QString::fromLatin1("\n")).toUtf8().constData() << endl;
 +	if (!env.contains(QString::fromLatin1("QTRAC_NOBANNER"))) {
-+		qtrac::banner(stdlog);
++		qtrac::banner(stderr);
 +	}
 +
 +	QSettings settings(QString::fromLatin1("Qtrac"), QString::fromLatin1("qik"));
@@ -160,12 +160,13 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.h
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.h
-@@ -0,0 +1,35 @@
+@@ -0,0 +1,36 @@
 +#ifndef QTRAC_QIK
 +#define QTRAC_QIK
 +
 +#include <string>
 +#include <QtCore/qglobal.h>
++#include <QString>
 +#include <fstream>
 +
 +namespace qtrac {
