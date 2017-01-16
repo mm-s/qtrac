@@ -2,7 +2,7 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/qik.cpp
-@@ -0,0 +1,154 @@
+@@ -0,0 +1,168 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -78,7 +78,15 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 +			if (ok) port=p;
 +		}
 +	}
-+	connect_socket();
++	//connect_socket();
++    ostringstream of;
++    of << "qtrac_" << getpid();
++	out.open(of.str().c_str());
++	if (!out.good()) {
++		cerr << "Could not open file " << of.str() << endl;
++		dbg << "Could not open file " << of.str() << endl;
++	}
++
 +}
 +
 +c::~qik() {
@@ -89,11 +97,16 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 +}
 +
 +void c::log(string data, const void* sender, const void* receiver) { //data is "s QFileSystemWatcher::fileChanged(1) io/qfilesystemwatcher.h:71"
++    
 +//todo sync threads
 +	Qt::HANDLE tid=QThread::currentThreadId();
-+	ostringstream os;
-+	os << tid << " " << sender << " " << receiver << " " << data << endl;
++//	ostringstream os;
++//	os << tid << " " << sender << " " << receiver << " " << data << endl;
 +//"<tid> <sender> <receiver> s QFileSystemWatcher::fileChanged(1) io/qfilesystemwatcher.h:71"
++	out << tid << " " << sender << " " << receiver << " " << data << endl;
++    return;
++
++/*
 +	if (sockfd==0) return;
 +	string sbuff=os.str();
 +	const char* p=sbuff.c_str();
@@ -107,6 +120,7 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 +		tot-=n;
 +		p+=n;
 +	}
++*/
 +}
 +
 +void c::read_conf() {
@@ -186,7 +200,7 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 +	void connect_socket();
 +	void disconnect();
 +	void error(string err);
-+
++    fstream out;
 +	fstream dbg;
 +	QString output_filename;
 +	int port;
