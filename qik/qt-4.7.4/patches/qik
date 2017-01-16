@@ -27,7 +27,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +
 +c _qik_instance;
 +
-+c::qik(): debug(0), port(0) {
++c::qik(): port(0) {
 +	QProcessEnvironment env=QProcessEnvironment::systemEnvironment();
 +	if (env.contains(QString::fromLatin1("QTRAC_LOG"))) {
 +		dbg.open(env.value(QString::fromLatin1("QTRAC_LOG")).toStdString().c_str(),ios::app);
@@ -112,7 +112,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +void c::read_conf() {
 +}
 +
-+void c::error(string ) {
++void c::error(string errmsg) {
 +	dbg << errmsg << endl;
 +}
 +
