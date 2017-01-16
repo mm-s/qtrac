@@ -37,7 +37,7 @@ Index: qt-everywhere-opensource-src-4.7.4-qtrac-1.0/src/corelib/global/qik.cpp
 +	}
 +	dbg << "Env" << endl;
 +	dbg << env.toStringList().join(QString::fromLatin1("\n")).toUtf8().constData() << endl;
-+	if (!env.contains(QString::fromLatin1("QTRAC_NOBANNER"))) {
++	if (!env.contains(QString::fromLatin1("QTRAC_QUIET"))) {
 +		qtrac::banner(stderr);
 +	}
 +

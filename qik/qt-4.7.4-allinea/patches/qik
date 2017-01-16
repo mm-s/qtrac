@@ -2,7 +2,7 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 ===================================================================
 --- /dev/null
 +++ qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/qik.cpp
-@@ -0,0 +1,177 @@
+@@ -0,0 +1,180 @@
 +#include "qik.h"
 +#include <stdio.h>
 +#include <QThread>
@@ -37,7 +37,7 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 +	}
 +	dbg << "Env" << endl;
 +	dbg << env.toStringList().join(QString::fromLatin1("\n")).toUtf8().constData() << endl;
-+	if (!env.contains(QString::fromLatin1("QTRAC_NOBANNER"))) {
++	if (!env.contains(QString::fromLatin1("QTRAC_QUIET"))) {
 +		qtrac::banner(stderr);
 +	}
 +
@@ -87,7 +87,9 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 +		dbg << "Could not open file " << of.str() << endl;
 +	}
 +    else {
-+		cerr << "writting to file " << of.str() << endl;
++	    if (!env.contains(QString::fromLatin1("QTRAC_QUIET"))) {
++    		cerr << "writting to file " << of.str() << endl;
++        }
 +		dbg << "writting to file " << of.str() << endl;
 +    }
 +
@@ -99,6 +101,7 @@ Index: qt-everywhere-opensource-src-4.7.4-allinea-qtrac-1.0/src/corelib/global/q
 +qik& c::instance() {
 +	return _qik_instance;
 +}
++
 +
 +void c::log(string data, const void* sender, const void* receiver) { //data is "s QFileSystemWatcher::fileChanged(1) io/qfilesystemwatcher.h:71"
 +    
