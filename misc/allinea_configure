@@ -1,0 +1,21 @@
+#!/bin/sh
+
+INSTALL_BASE="/home/public/buildQT/Linux/Debian/8.5/x86_64"
+install_dir="/home/public/buildQT/Linux/Debian/8.5/x86_64/qt4-qtrac-shared-4.7.4-debug/"
+
+CONFIG="-shared -qt-sql-sqlite  -exceptions -no-phonon -no-phonon-backend -no-libtiff -no-libmng -no-webkit -nomake examples -nomake demos -nomake docs -nomake translations -buildkey Allinea"
+CONFIG="$CONFIG -no-xinput -no-glib -no-dbus -no-cups -no-gtkstyle -no-rpath"
+CONFIG="$CONFIG -L$INSTALL_BASE/X11-pic/lib -I$INSTALL_BASE/X11-pic/include -L$INSTALL_BASE/Mesa-shared/lib -I$INSTALL_BASE/Mesa-shared/include"
+GUI="-opengl -sm -xshape -xinerama -xcursor -xrandr -xrender -xfixes -qt-freetype"
+CONFIG="$CONFIG -system-zlib"
+GUI="$GUI -fontconfig -qt-libpng -qt-libjpeg -xkb"
+
+config_flags="$CONFIG $GUI"
+
+./configure -v -debug -prefix $install_dir $config_flags
+
+
+
+
+
+
